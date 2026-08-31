@@ -5,6 +5,7 @@
 - 项目版本：**v1.0.4**
 - 官网：<https://dnteam.top>
 - API 文档：<https://dnteam.top/KJK/api/api_docs.html>
+- AI辅助生成
 
 ***
 
