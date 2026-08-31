@@ -1,0 +1,3541 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJK Encryptor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Sans+HK:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafafa;
+  --bg-card: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-hover: #ececf0;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #aeaeb2;
+  --border: #e5e5e7;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-soft: rgba(0,113,227,0.08);
+  --danger: #ff3b30;
+  --success: #34c759;
+  --warning: #ff9500;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-sans: 'Noto Sans SC', 'Noto Sans HK', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  --transition: 0.2s cubic-bezier(0.25,0.1,0.25,1);
+}
+[data-theme="dark"] {
+  --bg: #1a1a1e;
+  --bg-card: #252529;
+  --bg-secondary: #2c2c30;
+  --bg-hover: #323236;
+  --text: #f5f5f7;
+  --text-secondary: #98989d;
+  --text-tertiary: #6e6e73;
+  --border: #3a3a3e;
+  --accent: #2997ff;
+  --accent-hover: #40a9ff;
+  --accent-soft: rgba(41,151,255,0.12);
+  --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  min-height:100vh;
+  transition:background var(--transition),color var(--transition);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--text-tertiary);border-radius:4px}
+
+/* Layout */
+.app{max-width:920px;margin:0 auto;padding:24px 20px 0;min-height:100vh;display:flex;flex-direction:column}
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0 16px;border-bottom:1px solid var(--border);margin-bottom:28px;
+  flex-wrap:wrap;gap:12px;
+}
+.app-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.app-brand-icon{
+  font-size:28px;font-weight:700;
+  background:linear-gradient(135deg,#0071e3,#40a9ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:-0.5px;
+}
+.app-brand-text{font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.app-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;font-family:var(--font-sans);
+  border:1px solid var(--border);background:var(--bg-card);color:var(--text);
+  cursor:pointer;transition:all var(--transition);white-space:nowrap;
+  user-select:none;line-height:1.4;
+}
+.btn:hover{background:var(--bg-secondary);border-color:var(--text-tertiary)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-danger:hover{opacity:0.9}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:var(--accent-soft)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-icon{padding:6px;min-width:32px;height:32px}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg-secondary);padding:3px;border-radius:var(--radius-sm);margin-bottom:24px}
+.tab{
+  flex:1;padding:10px 16px;text-align:center;border:none;background:transparent;
+  font-size:14px;font-weight:500;font-family:var(--font-sans);color:var(--text-secondary);
+  cursor:pointer;border-radius:6px;transition:all var(--transition);
+}
+.tab.active{background:var(--bg-card);color:var(--text);box-shadow:var(--shadow)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* Cards */
+.card{
+  background:var(--bg-card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:24px;margin-bottom:20px;
+  border:1px solid var(--border);transition:all var(--transition);
+}
+.card-title{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.card-desc{font-size:13px;color:var(--text-secondary);margin-bottom:16px}
+
+/* Form */
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-secondary)}
+textarea,input[type="text"],input[type="password"],select{
+  width:100%;padding:10px 14px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--text);font-size:14px;font-family:var(--font-mono);
+  transition:border var(--transition),box-shadow var(--transition);outline:none;resize:vertical;
+}
+textarea:focus,input[type="text"]:focus,input[type="password"]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{min-height:100px;line-height:1.5;font-family:var(--font-mono)}
+select{font-family:var(--font-sans);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.checkbox-row{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);cursor:pointer}
+.checkbox-row input[type="checkbox"]{width:auto;height:16px;width:16px;cursor:pointer;accent-color:var(--accent)}
+
+/* File Drop Zone */
+.drop-zone{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:40px 20px;text-align:center;cursor:pointer;
+  transition:all var(--transition);position:relative;background:var(--bg-secondary);
+}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:var(--accent-soft)}
+.drop-zone-icon{font-size:36px;margin-bottom:8px;opacity:0.5}
+.drop-zone-text{font-size:14px;color:var(--text-secondary);margin-bottom:4px}
+.drop-zone-hint{font-size:12px;color:var(--text-tertiary)}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* Mode Switch */
+.mode-switch{display:flex;gap:8px;margin-bottom:16px}
+.mode-option{
+  flex:1;padding:10px;text-align:center;border:2px solid var(--border);
+  border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition);
+  font-size:13px;font-weight:500;background:var(--bg-secondary);color:var(--text-secondary);
+}
+.mode-option:hover{border-color:var(--text-tertiary)}
+.mode-option.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* File List */
+.file-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.file-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--bg-secondary);border-radius:var(--radius-sm);
+  font-size:13px;gap:12px;transition:background var(--transition);
+}
+.file-item:hover{background:var(--bg-hover)}
+.file-item-info{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.file-item-icon{font-size:18px;flex-shrink:0}
+.file-item-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item-size{color:var(--text-tertiary);font-size:12px;white-space:nowrap}
+.file-item-status{font-size:12px;padding:2px 8px;border-radius:4px}
+.file-item-status.success{background:rgba(52,199,89,0.15);color:var(--success)}
+.file-item-status.pending{background:rgba(255,149,0,0.15);color:var(--warning)}
+
+/* Results */
+.result-area{margin-top:16px;display:none}
+.result-area.visible{display:block}
+.result-text{
+  background:var(--bg-secondary);border-radius:var(--radius-sm);
+  padding:16px;font-family:var(--font-mono);font-size:14px;
+  word-break:break-all;line-height:1.8;max-height:200px;overflow-y:auto;
+  border:1px solid var(--border);margin-bottom:12px;
+}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Preview */
+.preview-area{margin-top:16px}
+.preview-area img{max-width:100%;max-height:400px;border-radius:var(--radius-sm);object-fit:contain;background:var(--bg-secondary)}
+.preview-area audio{width:100%;margin-top:8px}
+.preview-area video{max-width:100%;max-height:400px;border-radius:var(--radius-sm)}
+.preview-area pre{
+  background:var(--bg-secondary);padding:16px;border-radius:var(--radius-sm);
+  font-family:var(--font-mono);font-size:13px;max-height:300px;overflow:auto;
+  white-space:pre-wrap;word-break:break-all;border:1px solid var(--border);
+}
+
+/* Decrypt result: toolbar, tree, status */
+.package-manager{display:none}
+.package-manager.visible{display:block}
+.tree-toolbar{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;
+  padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.tree-toolbar .btn{flex:1;min-width:fit-content}
+.tree-view{
+  font-size:14px;line-height:1.6;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg-secondary);padding:8px;max-height:420px;overflow:auto;
+}
+.tree-node{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 8px;border-radius:6px;cursor:pointer;user-select:none;
+  transition:background var(--transition),color var(--transition);
+}
+.tree-node:hover{background:var(--bg-hover)}
+.tree-node.selected{background:var(--accent-soft);color:var(--accent)}
+.tree-toggle{
+  width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--text-secondary);transition:transform .2s ease;
+  flex-shrink:0;
+}
+.tree-toggle.collapsed{transform:rotate(-90deg)}
+.tree-toggle.leaf{visibility:hidden}
+.tree-icon{font-size:17px;flex-shrink:0}
+.tree-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree-size{font-size:11px;color:var(--text-tertiary);white-space:nowrap}
+.tree-status{font-size:12px}
+.tree-children{
+  display:grid;grid-template-rows:1fr;margin-left:18px;
+  transition:grid-template-rows .25s ease,opacity .2s ease;
+}
+.tree-children.collapsed{
+  grid-template-rows:0fr;opacity:0;
+}
+.tree-children-inner{overflow:hidden}
+.tree-status-bar{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:12px;color:var(--text-secondary);
+}
+.tree-empty{text-align:center;padding:32px 16px;color:var(--text-tertiary);font-size:13px}
+.legacy-notice{
+  margin:0 8px 8px;padding:8px 12px;border-radius:var(--radius-sm);
+  background:rgba(255,180,0,0.12);border:1px solid rgba(255,180,0,0.4);
+  color:var(--warning);font-size:12px;line-height:1.5;
+}
+
+/* Settings Panel */
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(4px);z-index:100;opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.settings-overlay.open{opacity:1;pointer-events:all}
+.settings-panel{
+  position:fixed;top:0;right:0;bottom:0;width:360px;max-width:90vw;
+  background:var(--bg-card);z-index:101;
+  transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.25,0.1,0.25,1);
+  padding:28px 24px;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,0.1);
+  border-left:1px solid var(--border);
+}
+.settings-overlay.open .settings-panel{transform:translateX(0)}
+.settings-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.settings-title{font-size:18px;font-weight:600}
+.settings-close{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;padding:4px}
+.settings-close:hover{color:var(--text)}
+.settings-section{margin-bottom:24px}
+.settings-section-title{font-size:13px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
+
+/* Toggle Switch */
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0;gap:12px}
+.toggle-label{font-size:14px}
+.toggle-switch{
+  position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;
+  background:var(--text-tertiary);border-radius:12px;transition:background var(--transition);
+}
+.toggle-switch.active{background:var(--accent)}
+.toggle-switch::after{
+  content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;
+  background:#fff;border-radius:50%;transition:transform var(--transition);
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.active::after{transform:translateX(20px)}
+
+/* Footer */
+.app-footer{
+  margin-top:auto;padding:24px 0 20px;text-align:center;
+  border-top:1px solid var(--border);font-size:13px;color:var(--text-tertiary);
+}
+.app-footer a{color:var(--accent);text-decoration:none;font-weight:500}
+.app-footer a:hover{text-decoration:underline}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--bg-card);color:var(--text);padding:12px 24px;
+  border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);
+  border:1px solid var(--border);font-size:14px;z-index:200;
+  opacity:0;transition:all 0.3s cubic-bezier(0.25,0.1,0.25,1);
+  pointer-events:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Empty state */
+.empty-state{text-align:center;padding:32px 16px;color:var(--text-tertiary)}
+.empty-state-icon{font-size:48px;margin-bottom:12px;opacity:0.4}
+.empty-state-text{font-size:14px}
+
+/* Progress bar */
+.progress-bar{height:3px;background:var(--bg-secondary);border-radius:2px;overflow:hidden;margin-top:12px;display:none}
+.progress-bar.visible{display:block}
+.progress-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s ease;width:0%}
+
+/* Package list */
+.package-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.package-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;background:var(--bg-secondary);border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+}
+.package-item-info{min-width:0;flex:1}
+.package-item-name{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.package-item-meta{font-size:12px;color:var(--text-tertiary)}
+
+/* Responsive */
+@media(max-width:640px){
+  .app{padding:16px 12px 0}
+  .app-header{padding:8px 0 12px;margin-bottom:20px}
+  .card{padding:16px}
+  .drop-zone{padding:24px 16px}
+  .settings-panel{width:100%;max-width:100%}
+  .result-actions{flex-direction:column}
+  .result-actions .btn{width:100%}
+  .tree-toolbar .btn{flex:1 1 45%}
+}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease forwards}
+@keyframes glitch{
+  0%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(2px,-2px)}
+  60%{transform:translate(-1px,-1px)}80%{transform:translate(1px,1px)}100%{transform:translate(0)}
+}
+.glitch{animation:glitch 0.3s ease}
+
+/* Update Dialog */
+.update-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(4px);z-index:150;opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;display:flex;align-items:center;justify-content:center;
+}
+.update-overlay.open{opacity:1;pointer-events:all}
+.update-dialog{
+  background:var(--bg-card);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  width:480px;max-width:90vw;max-height:80vh;overflow-y:auto;
+  padding:28px;transform:translateY(12px);transition:transform 0.3s ease;
+}
+.update-overlay.open .update-dialog{transform:translateY(0)}
+.update-dialog-title{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:8px}
+.update-version-badge{
+  display:inline-block;background:var(--accent);color:#fff;
+  padding:4px 12px;border-radius:6px;font-size:18px;font-weight:700;margin-bottom:12px;
+}
+.update-meta{font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.7}
+.update-changelog{
+  background:var(--bg-secondary);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px;margin-bottom:20px;
+  max-height:200px;overflow-y:auto;font-size:13px;line-height:1.7;
+  color:var(--text-secondary);white-space:pre-wrap;word-break:break-all;
+}
+.update-actions{display:flex;gap:8px;flex-wrap:wrap}
+.update-actions .btn{flex:1;min-width:120px}
+
+/* Download Progress Modal */
+.download-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(4px);z-index:160;opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;display:flex;align-items:center;justify-content:center;
+}
+.download-overlay.open{opacity:1;pointer-events:all}
+.download-dialog{
+  background:var(--bg-card);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  width:400px;max-width:90vw;padding:28px;text-align:center;
+}
+.download-dialog-title{font-size:16px;font-weight:600;margin-bottom:18px;color:var(--text)}
+.download-progress-bar{height:8px;background:var(--bg-secondary);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.download-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hover));border-radius:4px;transition:width 0.2s ease;width:0%}
+.download-progress-text{font-size:13px;color:var(--text-secondary);margin-bottom:16px}
+.download-progress-detail{font-size:12px;color:var(--text-tertiary)}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Header -->
+  <header class="app-header">
+    <a href="#" class="app-brand" onclick="event.preventDefault()">
+      <span class="app-brand-icon">KJ</span>
+      <span class="app-brand-text" data-i18n="appName">KJK Encryptor</span>
+    </a>
+    <div class="app-actions">
+      <select id="langSelect" onchange="switchLang(this.value)" style="width:auto;padding:6px 28px 6px 10px;font-size:12px;font-family:var(--font-sans);background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;appearance:none;">
+        <option value="en">EN</option>
+        <option value="zh-HK">繁中(香港)</option>
+        <option value="zh-CN">简体</option>
+      </select>
+      <button class="btn btn-icon" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="btn btn-icon" onclick="toggleSettings()" title="Settings" aria-label="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="encrypt" onclick="switchTab('encrypt')" role="tab" aria-selected="true">
+      <span data-i18n="tabEncrypt">Encrypt</span>
+    </button>
+    <button class="tab" data-tab="decrypt" onclick="switchTab('decrypt')" role="tab" aria-selected="false">
+      <span data-i18n="tabDecrypt">Decrypt</span>
+    </button>
+  </div>
+
+  <!-- Encrypt Panel -->
+  <div id="panelEncrypt" class="tab-panel">
+    <div class="card">
+      <div class="card-title" data-i18n="inputSection">Input</div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="textInput">Text Input</label>
+        <textarea id="encryptText" placeholder="" data-i18n-placeholder="textInputPlaceholder" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="fileUpload">File Upload</label>
+        <div class="drop-zone" id="encryptDropZone">
+          <div class="drop-zone-icon">📂</div>
+          <div class="drop-zone-text" data-i18n="dropZoneText">Drop files or folders here or click to upload</div>
+          <div class="drop-zone-hint" data-i18n="dropZoneHint">Supports any file type</div>
+          <input type="file" id="encryptFileInput" multiple onchange="handleEncryptFiles(this.files)">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-sm" onclick="document.getElementById('encryptFolderInput').click()">
+            <span data-i18n="selectFolder">Select Folder</span>
+          </button>
+          <input type="file" id="encryptFolderInput" webkitdirectory directory style="display:none" onchange="handleEncryptFolder(this.files)">
+        </div>
+        <div id="encryptFileList" class="file-list"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" data-i18n="encryptSettings">Encryption Settings</div>
+      <div class="form-group">
+        <label class="checkbox-row">
+          <input type="checkbox" id="mergeToggle">
+          <span data-i18n="mergeIntoOnePackage">Merge into one package</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="passwordLabel">Password (optional)</label>
+        <div style="position:relative">
+          <input type="password" id="encryptPassword" placeholder="" data-i18n-placeholder="passwordPlaceholder"
+            style="width:100%;padding:10px 36px 10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:var(--font-sans);outline:none;transition:border 0.2s,box-shadow 0.2s;box-sizing:border-box">
+          <button type="button" onclick="togglePwdVisibility('encryptPassword',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-tertiary);cursor:pointer;padding:4px;font-size:14px" title="Toggle visibility">&#x1F441;</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="doEncrypt()" id="encryptBtn" style="width:100%;padding:12px;font-size:15px">
+        <span data-i18n="encryptBtn">Encrypt</span>
+      </button>
+      <div class="progress-bar" id="encryptProgress"><div class="progress-bar-fill" id="encryptProgressFill"></div></div>
+    </div>
+
+    <!-- Encrypt Results -->
+    <div class="card result-area" id="encryptResult">
+      <div class="card-title" data-i18n="encryptResult">Encryption Result</div>
+      <div id="encryptResultText" class="result-text"></div>
+      <div id="encryptPackageList" class="package-list"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="downloadKjk()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span data-i18n="downloadKjk">Download .kjk</span>
+        </button>
+        <button class="btn" onclick="copyResult()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span data-i18n="copy">Copy</span>
+        </button>
+        <button class="btn" onclick="clearEncrypt()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span data-i18n="clear">Clear</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decrypt Panel -->
+  <div id="panelDecrypt" class="tab-panel" style="display:none">
+    <div class="card">
+      <div class="card-title" data-i18n="decryptInput">Decrypt Input</div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="uploadKjk">Upload .kjk File</label>
+        <div class="drop-zone" id="decryptDropZone">
+          <div class="drop-zone-icon">🔓</div>
+          <div class="drop-zone-text" data-i18n="dropKjkText">Drop .kjk file here or click to upload</div>
+          <div class="drop-zone-hint" data-i18n="dropKjkHint">Supported: .kjk files</div>
+          <input type="file" id="decryptFileInput" accept=".kjk" multiple onchange="handleDecryptFiles(this.files)">
+        </div>
+        <div id="decryptFileList" class="file-list"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="btnAppendToKjk" class="btn" onclick="appendToPackage()" style="flex:1">
+          <span data-i18n="appendToPackage">Append to .kjk</span>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="orPasteCipher">Or paste ciphertext</label>
+        <textarea id="decryptText" placeholder="" data-i18n-placeholder="decryptPlaceholder" rows="4"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="doDecrypt()" id="decryptBtn" style="width:100%;padding:12px;font-size:15px">
+        <span data-i18n="decryptBtn">Decrypt</span>
+      </button>
+    </div>
+
+    <!-- Decrypt Results -->
+    <div class="card result-area" id="decryptResult">
+      <div class="card-title" data-i18n="packageManager">Package Manager</div>
+
+      <div class="tree-toolbar" id="decryptToolbar">
+        <button class="btn btn-sm" onclick="extractSelectedEntry()">
+          <span data-i18n="extractSelected">Extract Selected</span>
+        </button>
+        <button class="btn btn-sm" onclick="deleteSelectedEntry()">
+          <span data-i18n="deleteSelected">Delete Selected</span>
+        </button>
+        <button class="btn btn-sm" onclick="renameSelectedEntry()">
+          <span data-i18n="renameEntry">Rename</span>
+        </button>
+        <button class="btn btn-sm" onclick="changePassword()">
+          <span data-i18n="changePassword">Change Password</span>
+        </button>
+        <button class="btn btn-sm" onclick="verifyPackageIntegrity()">
+          <span data-i18n="verifyIntegrity">Verify Integrity</span>
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="downloadAllDecryptedAsZip()">
+          <span data-i18n="downloadAllZip">Download All as ZIP</span>
+        </button>
+      </div>
+
+      <div id="decryptedItems" class="tree-view"></div>
+      <div id="decryptPreview" class="preview-area"></div>
+
+      <div class="tree-status-bar" id="decryptStatusBar">
+        <span id="statusTotalFiles">0 files</span>
+        <span id="statusTotalSize">0 B</span>
+        <span id="statusProtected" style="display:none">🔒 <span data-i18n="statusProtected">Protected</span></span>
+      </div>
+
+      <div class="result-actions" id="decryptActions" style="display:none;margin-top:12px">
+        <button class="btn btn-primary" onclick="downloadAllDecryptedAsZip()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span data-i18n="downloadAll">Download All</span>
+        </button>
+        <button class="btn" onclick="clearDecrypt()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span data-i18n="clear">Clear</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+    <div class="settings-panel" onclick="event.stopPropagation()">
+      <div class="settings-header">
+        <div class="settings-title" data-i18n="settings">Settings</div>
+        <button class="settings-close" onclick="toggleSettings()">&times;</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="appearance">Appearance</div>
+        <div class="toggle">
+          <span class="toggle-label" data-i18n="darkMode">Dark Mode</span>
+          <div class="toggle-switch" id="darkModeToggle" onclick="toggleTheme()" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="toggle">
+          <span class="toggle-label" data-i18n="cleanUI">Clean UI Mode</span>
+          <div class="toggle-switch" id="cleanUIToggle" onclick="toggleCleanUI()" role="switch" aria-checked="false"></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="preview">Preview</div>
+        <div class="toggle">
+          <span class="toggle-label" data-i18n="enablePreview">Enable Content Preview</span>
+          <div class="toggle-switch active" id="previewToggle" onclick="togglePreview()" role="switch" aria-checked="true"></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="language">Language</div>
+        <select id="settingsLangSelect" onchange="switchLang(this.value)" style="width:100%">
+          <option value="en">English</option>
+          <option value="zh-HK">繁體中文 (香港)</option>
+          <option value="zh-CN">简体中文</option>
+        </select>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="updateSection">Update</div>
+        <div class="toggle">
+          <span class="toggle-label" data-i18n="checkUpdateOnStart">Check for updates on startup</span>
+          <div class="toggle-switch active" id="checkUpdateToggle" onclick="toggleCheckUpdate()" role="switch" aria-checked="true"></div>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label" data-i18n="updateServer">Custom update server (optional)</label>
+          <input type="text" id="updateServerInput" placeholder="https://example.com/" style="font-size:13px">
+          <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px" data-i18n="updateServerHint">Leave empty to use default servers</div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="formatCompat">Format Compatibility</div>
+        <select id="formatCompatSelect" onchange="setFormatCompat(this.value)" style="width:100%;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text)">
+          <option value="auto" data-i18n="formatAuto">Auto (detect automatically)</option>
+          <option value="KJKv9" data-i18n="formatV9">KJKv9 (v1.0.4 C engine binary)</option>
+          <option value="KJKv7" data-i18n="formatV7">KJKv7 (v1.0.3 AES-256-GCM)</option>
+          <option value="KJKv5" data-i18n="formatV5">KJKv5 (v1.0.2 SHA-256)</option>
+        </select>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:6px" data-i18n="formatCompatHint">Auto mode detects the format from the file. Select specific version for compatibility.</div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">About</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+          <div><strong data-i18n="version">Version</strong>: <span id="settingsVersion">1.0.4</span></div>
+          <div><strong data-i18n="algorithm">Algorithm</strong>: KJK v1</div>
+          <div style="margin-top:8px">
+            <button class="btn btn-sm" onclick="openApiDocs()" style="width:100%">
+              📖 <span data-i18n="apiDocs">API Documentation</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div style="margin-bottom:8px">
+      <button class="btn btn-sm" id="checkUpdateBtn" onclick="checkForUpdate()">
+        🔄 <span data-i18n="checkUpdate">Check for Updates</span>
+      </button>
+    </div>
+    <span data-i18n="poweredBy">Powered by</span>
+    <a href="https://dnteam.top" target="_blank" rel="noopener">DNT Group</a>
+  </footer>
+
+  <!-- Update Dialog -->
+  <div class="update-overlay" id="updateOverlay" onclick="closeUpdateDialog(event)">
+    <div class="update-dialog" onclick="event.stopPropagation()">
+      <div class="update-dialog-title">
+        🆕 <span data-i18n="updateAvailable">Update Available</span>
+      </div>
+      <div class="update-version-badge" id="updateNewVersion"></div>
+      <div class="update-meta">
+        <div><span data-i18n="currentVersionLabel">Current Version</span>: <strong id="updateCurrentVersion"></strong></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px" data-i18n="changelog">Changelog</div>
+      <div class="update-changelog" id="updateChangelog"></div>
+      <div class="update-actions">
+        <button class="btn btn-primary" onclick="showDownloadSourceDialog()" style="flex:1">
+          ⬇️ <span data-i18n="downloadPrimary">Download</span>
+        </button>
+        <button class="btn btn-ghost" onclick="closeUpdateDialog()" style="flex:0">
+          <span data-i18n="remindLater">Remind Me Later</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Progress Modal -->
+  <div class="download-overlay" id="downloadOverlay">
+    <div class="download-dialog">
+      <div class="download-dialog-title" id="downloadTitle">🔄 Downloading...</div>
+      <div class="download-progress-bar"><div class="download-progress-fill" id="downloadProgressFill"></div></div>
+      <div class="download-progress-text" id="downloadProgressText">0%</div>
+      <div class="download-progress-detail" id="downloadProgressDetail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================== i18n ========================
+const i18n = {
+  en: {
+    appName: 'KJK Encryptor',
+    tabEncrypt: 'Encrypt',
+    tabDecrypt: 'Decrypt',
+    inputSection: 'Input',
+    textInput: 'Text Input',
+    textInputPlaceholder: 'Type or paste text here...',
+    fileUpload: 'File Upload',
+    dropZoneText: 'Drop files or folders here or click to upload',
+    dropZoneHint: 'Supports any file type',
+    selectFolder: 'Select Folder',
+    cannotDownloadFolder: 'Please download the whole package as ZIP for folders.',
+    zipLibraryMissing: 'ZIP library not loaded, please check your network.',
+    download: 'Download',
+    encryptSettings: 'Encryption Settings',
+    encryptBtn: 'Encrypt',
+    encryptResult: 'Encryption Result',
+    downloadKjk: 'Download .kjk',
+    copy: 'Copy',
+    clear: 'Clear',
+    decryptInput: 'Decrypt Input',
+    uploadKjk: 'Upload .kjk File',
+    dropKjkText: 'Drop .kjk file here or click to upload',
+    dropKjkHint: 'Supported: .kjk files',
+    orPasteCipher: 'Or paste ciphertext',
+    decryptPlaceholder: 'Paste ciphertext here...',
+    decryptBtn: 'Decrypt',
+    decryptResult: 'Decryption Result',
+    downloadAll: 'Download All',
+    downloadAllZip: 'Download All as ZIP',
+    settings: 'Settings',
+    appearance: 'Appearance',
+    darkMode: 'Dark Mode',
+    cleanUI: 'Clean UI Mode',
+    preview: 'Preview',
+    enablePreview: 'Enable Content Preview',
+    language: 'Language',
+    version: 'Version',
+    algorithm: 'Algorithm',
+    poweredBy: 'Powered by',
+    filesSelected: 'files selected',
+    encrypting: 'Encrypting...',
+    decrypting: 'Decrypting...',
+    copySuccess: 'Copied to clipboard!',
+    downloadSuccess: 'Download started!',
+    noInput: 'Please enter text or select files.',
+    noCipher: 'Please upload a .kjk file or paste ciphertext.',
+    decryptSuccess: 'Decryption complete!',
+    encryptSuccess: 'Encryption complete!',
+    invalidKjk: 'Invalid or corrupted .kjk file.',
+    previewDisabled: 'Preview disabled in settings.',
+    decryptMode: 'Decryption Mode',
+    autoDetect: 'Auto-detect',
+    textFile: 'Text File',
+    imageFile: 'Image',
+    audioFile: 'Audio',
+    videoFile: 'Video',
+    svgFile: 'SVG',
+    binaryFile: 'Binary File',
+    passwordLabel: 'Password (optional)',
+    passwordPlaceholder: 'Leave empty for no password',
+    passwordRequired: 'Password Required',
+    passwordOptional: 'Password (optional)',
+    enterPassword: 'Enter password...',
+    wrongPassword: 'Wrong password or corrupted file',
+    retryPassword: 'Retry Password',
+    pending: 'Pending',
+    checkUpdate: 'Check for Updates',
+    latestVersion: 'You are on the latest version!',
+    updateAvailable: 'Update Available',
+    newVersion: 'New Version',
+    currentVersionLabel: 'Current Version',
+    changelog: 'Changelog',
+    downloadPrimary: 'Download (Primary)',
+    downloadBackup: 'Download (Backup)',
+    remindLater: 'Remind Me Later',
+    downloading: 'Downloading...',
+    downloadComplete: 'Download Complete!',
+    updateError: 'Failed to check for updates',
+    checkingUpdate: 'Checking for updates...',
+    chooseDownload: 'Please choose a download source',
+    downloadServerPrimary: 'Primary Server (dnteam.top)',
+    downloadServerBackup: 'Backup Server (917813.help)',
+    updateSection: 'Update',
+    checkUpdateOnStart: 'Check for updates on startup',
+    updateServer: 'Custom update server (optional)',
+    updateServerHint: 'Leave empty to use default servers',
+    apiDocs: 'API Documentation',
+    mergeIntoOnePackage: 'Merge into one package',
+    packageManager: 'Package Manager',
+    extractSelected: 'Extract Selected',
+    deleteSelected: 'Delete Selected',
+    renameEntry: 'Rename',
+    changePassword: 'Change Password',
+    verifyIntegrity: 'Verify Integrity',
+    appendToPackage: 'Append to Package',
+    savePackage: 'Save Package',
+    treeNoSelection: 'No selection',
+    statusTotalFiles: 'Total files',
+    statusTotalSize: 'Total size',
+    statusProtected: 'Protected',
+    integrityOk: 'Integrity check passed',
+    integrityFailed: 'Integrity check failed',
+    integrityNoHash: 'No integrity hash available',
+    cannotModifyFolder: 'Cannot modify folder',
+    renamePrompt: 'Enter new name:',
+    changePasswordPrompt: 'Enter new password:',
+    newPasswordConfirm: 'Confirm new password:',
+    passwordMismatch: 'Passwords do not match',
+    confirmDelete: 'Delete selected entry?',
+    editSuccess: 'Package updated — new .kjk saved',
+    legacyNotice: 'Legacy-format package (KJKv7/KJKv5). Re-encrypt as KJKv9 for best compatibility & performance.',
+    formatCompat: 'Format Compatibility',
+    formatAuto: 'Auto (detect automatically)',
+    formatV9: 'KJKv9 (v1.0.4 C engine binary)',
+    formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
+    formatV5: 'KJKv5 (v1.0.2 SHA-256)',
+    formatCompatHint: 'Auto mode detects the format from the file. Select specific version for compatibility.'
+  },
+  'zh-HK': {
+    appName: 'KJK Encryptor',
+    tabEncrypt: '加密',
+    tabDecrypt: '解密',
+    inputSection: '輸入區',
+    textInput: '文字輸入',
+    textInputPlaceholder: '喺度輸入或者paste文字...',
+    fileUpload: '檔案上傳',
+    dropZoneText: 'Drop files或者folder呢度，又或者click上傳',
+    dropZoneHint: '支援任何file type',
+    selectFolder: '揀資料夾',
+    cannotDownloadFolder: '資料夾請用「全部下載」ZIP 方式下載。',
+    zipLibraryMissing: 'ZIP 庫未載入，請檢查網絡連線。',
+    download: '下載',
+    encryptSettings: '加密設定',
+    encryptBtn: '加密',
+    encryptResult: '加密結果',
+    downloadKjk: '下載 .kjk',
+    copy: '複製',
+    clear: '清除',
+    decryptInput: '解密輸入',
+    uploadKjk: '上傳 .kjk 檔案',
+    dropKjkText: 'Drop .kjk file呢度或者click上傳',
+    dropKjkHint: '支援：.kjk files',
+    orPasteCipher: '或者paste密文',
+    decryptPlaceholder: '喺度paste密文...',
+    decryptBtn: '解密',
+    decryptResult: '解密結果',
+    downloadAll: '全部下載',
+    downloadAllZip: '全部下載為 ZIP',
+    settings: '設定',
+    appearance: '外觀',
+    darkMode: '深色模式',
+    cleanUI: '簡潔UI模式',
+    preview: '預覽',
+    enablePreview: '啟用內容預覽',
+    language: '語言',
+    version: '版本',
+    algorithm: '演算法',
+    poweredBy: '技術提供',
+    filesSelected: '個files已選',
+    encrypting: '加密中...',
+    decrypting: '解密中...',
+    copySuccess: '已copy到clipboard！',
+    downloadSuccess: '開始download！',
+    noInput: '請輸入文字或者select files。',
+    noCipher: '請upload .kjk file或者paste密文。',
+    decryptSuccess: '解密完成！',
+    encryptSuccess: '加密完成！',
+    invalidKjk: '無效或者損毀嘅.kjk file。',
+    previewDisabled: 'Preview已喺settings關閉。',
+    decryptMode: '解密模式',
+    autoDetect: '自動偵測',
+    textFile: '文字檔案',
+    imageFile: '圖片',
+    audioFile: '音訊',
+    videoFile: '視訊',
+    svgFile: 'SVG',
+    binaryFile: 'Binary檔案',
+    passwordLabel: '密碼 (可選)',
+    passwordPlaceholder: '留空即唔設密碼',
+    passwordRequired: '需要密碼',
+    passwordOptional: '密碼 (可選)',
+    enterPassword: '輸入密碼...',
+    wrongPassword: '密碼錯誤或文件已損壞',
+    retryPassword: '重試密碼',
+    pending: '待處理',
+    checkUpdate: '檢查更新',
+    latestVersion: '你已經係最新版本！',
+    updateAvailable: '有更新可用',
+    newVersion: '新版本',
+    currentVersionLabel: '當前版本',
+    changelog: '更新日誌',
+    downloadPrimary: '下載 (主伺服器)',
+    downloadBackup: '下載 (備用伺服器)',
+    remindLater: '之後先',
+    downloading: '下載緊...',
+    downloadComplete: '下載完成！',
+    updateError: '檢查更新失敗',
+    checkingUpdate: '檢查更新中...',
+    chooseDownload: '請選擇下載來源',
+    downloadServerPrimary: '主伺服器 (dnteam.top)',
+    downloadServerBackup: '備用伺服器 (917813.help)',
+    updateSection: '更新',
+    checkUpdateOnStart: '啟動時檢查更新',
+    updateServer: '自訂更新伺服器 (可選)',
+    updateServerHint: '留空則使用預設伺服器',
+    apiDocs: 'API 文檔',
+    mergeIntoOnePackage: '合併為一個套件',
+    packageManager: '套件管理員',
+    extractSelected: '提取選取項目',
+    deleteSelected: '刪除選取項目',
+    renameEntry: '重新命名',
+    changePassword: '更改密碼',
+    verifyIntegrity: '驗證完整性',
+    appendToPackage: '附加到套件',
+    savePackage: '儲存套件',
+    treeNoSelection: '未有選取',
+    statusTotalFiles: '總檔案數',
+    statusTotalSize: '總大小',
+    statusProtected: '受保護',
+    integrityOk: '完整性檢查通過',
+    integrityFailed: '完整性檢查失敗',
+    integrityNoHash: '無可用完整性雜湊',
+    cannotModifyFolder: '無法修改資料夾',
+    renamePrompt: '輸入新名稱：',
+    changePasswordPrompt: '輸入新密碼：',
+    newPasswordConfirm: '確認新密碼：',
+    passwordMismatch: '密碼不一致',
+    confirmDelete: '確定刪除選取項目？',
+    editSuccess: '套件已更新 — 已儲存新 .kjk',
+    legacyNotice: '此為舊版格式套件 (KJKv7/KJKv5)。建議重新加密為 KJKv9 以獲得最佳兼容性及效能。',
+    formatCompat: '格式兼容性',
+    formatAuto: '自動 (自動檢測)',
+    formatV9: 'KJKv9 (v1.0.4 C 引擎二進制)',
+    formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
+    formatV5: 'KJKv5 (v1.0.2 SHA-256)',
+    formatCompatHint: '自動模式會從檔案中檢測格式。揀特定版本以兼容舊版。'
+  },
+  'zh-CN': {
+    appName: 'KJK 加密器',
+    tabEncrypt: '加密',
+    tabDecrypt: '解密',
+    inputSection: '输入',
+    textInput: '文本输入',
+    textInputPlaceholder: '在此输入或粘贴文字...',
+    fileUpload: '文件上传',
+    dropZoneText: '拖放文件或文件夹到这里，或点击上传',
+    dropZoneHint: '支持任意文件格式',
+    selectFolder: '选择文件夹',
+    cannotDownloadFolder: '文件夹请使用「全部下载」以 ZIP 方式下载。',
+    zipLibraryMissing: 'ZIP 库未加载，请检查网络连接。',
+    download: '下载',
+    encryptSettings: '加密设置',
+    encryptBtn: '加密',
+    encryptResult: '加密结果',
+    downloadKjk: '下载.kjk',
+    copy: '复制',
+    clear: '清除',
+    decryptInput: '解密输入',
+    uploadKjk: '上传.kjk文件',
+    dropKjkText: '拖放.kjk文件到这里或点击上传',
+    dropKjkHint: '支持：.kjk 文件',
+    orPasteCipher: '或粘贴密文',
+    decryptPlaceholder: '在此粘贴密文...',
+    decryptBtn: '解密',
+    decryptResult: '解密结果',
+    downloadAll: '全部下载',
+    downloadAllZip: '全部下载为 ZIP',
+    settings: '设置',
+    appearance: '外观',
+    darkMode: '深色模式',
+    cleanUI: '简洁UI模式',
+    preview: '预览',
+    enablePreview: '启用内容预览',
+    language: '语言',
+    version: '版本',
+    algorithm: '算法',
+    poweredBy: '技术提供',
+    filesSelected: '个文件已选择',
+    encrypting: '加密中...',
+    decrypting: '解密中...',
+    copySuccess: '已复制到剪贴板！',
+    downloadSuccess: '已开始下载！',
+    noInput: '请输入文本或选择文件。',
+    noCipher: '请上传.kjk文件或粘贴密文。',
+    decryptSuccess: '解密完成！',
+    encryptSuccess: '加密完成！',
+    invalidKjk: '无效或损坏的.kjk文件。',
+    previewDisabled: '预览功能已在设置中关闭。',
+    decryptMode: '解密模式',
+    autoDetect: '自动检测',
+    textFile: '文本文件',
+    imageFile: '图片',
+    audioFile: '音频',
+    videoFile: '视频',
+    svgFile: 'SVG',
+    binaryFile: '二进制文件',
+    passwordLabel: '密码 (可选)',
+    passwordPlaceholder: '留空则不设密码',
+    passwordRequired: '需要密码',
+    passwordOptional: '密码 (可选)',
+    enterPassword: '输入密码...',
+    wrongPassword: '密码错误或文件已损坏',
+    retryPassword: '重试密码',
+    pending: '待处理',
+    checkUpdate: '检查更新',
+    latestVersion: '您已是最新版本！',
+    updateAvailable: '有可用更新',
+    newVersion: '新版本',
+    currentVersionLabel: '当前版本',
+    changelog: '更新日志',
+    downloadPrimary: '下载（主服务器）',
+    downloadBackup: '下载（备用服务器）',
+    remindLater: '稍后提醒',
+    downloading: '下载中...',
+    downloadComplete: '下载完成！',
+    updateError: '检查更新失败',
+    checkingUpdate: '正在检查更新...',
+    chooseDownload: '请选择一个下载地址',
+    downloadServerPrimary: '主服务器 (dnteam.top)',
+    downloadServerBackup: '备用服务器 (917813.help)',
+    updateSection: '更新',
+    checkUpdateOnStart: '启动时检查更新',
+    updateServer: '自定义更新服务器 (可选)',
+    updateServerHint: '留空则使用默认服务器',
+    apiDocs: 'API 文档',
+    mergeIntoOnePackage: '合并为一个包',
+    packageManager: '包管理器',
+    extractSelected: '提取选中项',
+    deleteSelected: '删除选中项',
+    renameEntry: '重命名',
+    changePassword: '修改密码',
+    verifyIntegrity: '验证完整性',
+    appendToPackage: '追加到包',
+    savePackage: '保存包',
+    treeNoSelection: '未选择',
+    statusTotalFiles: '总文件数',
+    statusTotalSize: '总大小',
+    statusProtected: '受保护',
+    integrityOk: '完整性检查通过',
+    integrityFailed: '完整性检查失败',
+    integrityNoHash: '无可用完整性哈希',
+    cannotModifyFolder: '无法修改文件夹',
+    renamePrompt: '输入新名称：',
+    changePasswordPrompt: '输入新密码：',
+    newPasswordConfirm: '确认新密码：',
+    passwordMismatch: '密码不一致',
+    confirmDelete: '确定删除选中项？',
+    editSuccess: '包已更新 — 已保存新的 .kjk',
+    legacyNotice: '这是旧版格式包 (KJKv7/KJKv5)。建议重新加密为 KJKv9 以获得最佳兼容性和性能。',
+    formatCompat: '格式兼容性',
+    formatAuto: '自动 (自动检测)',
+    formatV9: 'KJKv9 (v1.0.4 C 引擎二进制)',
+    formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
+    formatV5: 'KJKv5 (v1.0.2 SHA-256)',
+    formatCompatHint: '自动模式会从文件中检测格式。选择特定版本以兼容旧版。'
+  }
+};
+
+// ======================== Update Constants ========================
+const CURRENT_VERSION = '1.0.4';
+const SERVER_URL_PRIMARY = 'https://dnteam.top/';
+const SERVER_URL_BACKUP = 'https://www.917813.help/';
+const DOWNLOAD_URL_PRIMARY = 'https://dnteam.top/KJK/KJKinstaller.exe';
+const DOWNLOAD_URL_BACKUP = 'https://www.917813.help/KJK/KJKinstaller.exe';
+
+let currentLang = 'en';
+let currentTheme = 'light';
+let currentTab = 'encrypt';
+let previewEnabled = true;
+let cleanUIMode = false;
+let lastUpdateData = null;
+
+// Encrypt state
+let encryptFiles = [];
+let encryptResultData = null;
+let encryptPackages = [];
+let formatCompat = 'auto';
+
+// Decrypt state
+let decryptFiles = [];
+let decryptResults = [];
+let selectedPreviewIdx = -1;
+let selectedTreeNode = null;
+let packageHasPassword = false;
+
+// ======================== i18n Engine ========================
+function t(key) {
+  return i18n[currentLang]?.[key] || i18n.en[key] || key;
+}
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    el.placeholder = t(key);
+  });
+}
+
+function switchLang(lang) {
+  currentLang = lang;
+  applyI18n();
+  document.getElementById('langSelect').value = lang;
+  document.getElementById('settingsLangSelect').value = lang;
+  localStorage.setItem('kjk_lang', lang);
+}
+
+// ======================== Theme ========================
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  currentTheme = isDark ? 'light' : 'dark';
+  document.getElementById('darkModeToggle').classList.toggle('active', !isDark);
+  updateThemeIcon();
+  localStorage.setItem('kjk_theme', currentTheme);
+}
+
+function updateThemeIcon() {
+  const icon = document.getElementById('themeIcon');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
+}
+
+function toggleCleanUI() {
+  cleanUIMode = !cleanUIMode;
+  document.getElementById('cleanUIToggle').classList.toggle('active', cleanUIMode);
+  document.body.style.setProperty('--radius', cleanUIMode ? '4px' : '12px');
+  document.body.style.setProperty('--radius-sm', cleanUIMode ? '2px' : '8px');
+  localStorage.setItem('kjk_cleanUI', cleanUIMode);
+}
+
+function togglePreview() {
+  previewEnabled = !previewEnabled;
+  document.getElementById('previewToggle').classList.toggle('active', previewEnabled);
+  localStorage.setItem('kjk_preview', previewEnabled);
+}
+
+// ======================== UI Controls ========================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+    t.setAttribute('aria-selected', t.dataset.tab === tab);
+  });
+  document.getElementById('panelEncrypt').style.display = tab === 'encrypt' ? 'block' : 'none';
+  document.getElementById('panelDecrypt').style.display = tab === 'decrypt' ? 'block' : 'none';
+}
+
+function toggleSettings() {
+  document.getElementById('settingsOverlay').classList.toggle('open');
+}
+
+function closeSettings(e) {
+  if (e && e.target === e.currentTarget) {
+    document.getElementById('settingsOverlay').classList.remove('open');
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  clearTimeout(toast._hide);
+  toast._hide = setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+// ======================== Encryption Engine v3 (base-20 单字符版) ========================
+const TOKENS = '锟斤拷烫屯锘!+啊胩岐鑁歸鈪誷鷖竊蛦唄咚';
+const BASE = TOKENS.length;
+
+const BYTE_DIGITS = new Uint8Array(512);
+for (let b = 0; b < 256; b++) { BYTE_DIGITS[b*2] = b % BASE; BYTE_DIGITS[b*2+1] = Math.floor(b / BASE); }
+
+function bytesToDigits(bytes) {
+  const n = bytes.length;
+  const result = new Uint8Array(n * 2);
+  for (let i = 0; i < n; i++) { const b = bytes[i]; result[i*2]=BYTE_DIGITS[b*2]; result[i*2+1]=BYTE_DIGITS[b*2+1]; }
+  return result;
+}
+function digitsToBytes(digits) {
+  if (digits.length % 2 !== 0) throw new Error('Invalid digit length');
+  const n = digits.length / 2;
+  const result = new Uint8Array(n);
+  for (let i = 0; i < n; i++) result[i] = (digits[i*2] + digits[i*2+1] * BASE) % 256;
+  return result;
+}
+function digitsToTokens(digits) { return Array.from(digits, d => TOKENS[d]).join(''); }
+
+const CHAR_VAL = {};
+for (let i = 0; i < TOKENS.length; i++) CHAR_VAL[TOKENS[i]] = i;
+
+function tokensToDigits(ciphertext) {
+  const result = [];
+  for (const ch of ciphertext.trim()) {
+    if (/\s/.test(ch)) continue;
+    const d = CHAR_VAL[ch];
+    if (d === undefined) throw new Error('Invalid token: ' + ch);
+    result.push(d);
+  }
+  return new Uint8Array(result);
+}
+
+async function sha256Buf(buf) { return new Uint8Array(await crypto.subtle.digest('SHA-256', buf)); }
+
+async function deriveKeystream(password, length) {
+  if (!password || !password.trim()) return new Uint8Array(length).fill(0);
+  const key = await sha256Buf(new TextEncoder().encode(password));
+  const needed = Math.ceil(length / 32);
+  const blocks = [];
+  for (let c = 0; c < needed; c++) {
+    const input = new Uint8Array(key.length + 4); input.set(key);
+    new DataView(input.buffer).setUint32(key.length, c, false);
+    blocks.push(sha256Buf(input));
+  }
+  const results = await Promise.all(blocks);
+  const stream = new Uint8Array(length);
+  let offset = 0;
+  for (const block of results) { const n = Math.min(block.length, length-offset); stream.set(block.subarray(0,n), offset); offset+=n; if(offset>=length) break; }
+  return stream;
+}
+
+// ======================== KJKv5 密码哈希头 (PBKDF2-SHA256) ========================
+const PBKDF2_ITERATIONS = 600000;
+const PBKDF2_SALT_LEN = 16;
+const PBKDF2_HASH_LEN = 32;
+
+async function derivePasswordHash(password, salt) {
+  if (!password || !password.trim()) return new Uint8Array(PBKDF2_HASH_LEN).fill(0);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const hash = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+    keyMaterial, PBKDF2_HASH_LEN * 8
+  );
+  return new Uint8Array(hash);
+}
+
+async function verifyPasswordHeader(encName, password) {
+  if (!encName.startsWith('pwd:')) return { valid: false, remaining: null };
+  const parts = encName.split(':');
+  if (parts.length < 4) return { valid: false, remaining: null };
+  const saltHex = parts[1];
+  const hashHex = parts[2];
+  const remaining = parts.slice(3).join(':');
+  if (saltHex.length !== PBKDF2_SALT_LEN * 2 || hashHex.length !== PBKDF2_HASH_LEN * 2) {
+    return { valid: false, remaining: null };
+  }
+  try {
+    const salt = new Uint8Array(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    const storedHash = new Uint8Array(hashHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    const computedHash = await derivePasswordHash(password, salt);
+    for (let i = 0; i < PBKDF2_HASH_LEN; i++) {
+      if (computedHash[i] !== storedHash[i]) return { valid: false, remaining: null };
+    }
+    return { valid: true, remaining };
+  } catch (e) {
+    return { valid: false, remaining: null };
+  }
+}
+
+// ======================== 新版密码头系统 ========================
+const PWD_HEADER_MARKER = 'kjk_pwd_hdr';
+const PWD_CONTENT_PREFIX = 'PWD:';
+
+async function detectPasswordHeader(results) {
+  if (!results || results.length === 0) {
+    return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+  }
+  const first = results[0];
+  const encName = first.enc_name || '';
+  try {
+    const nameData = await decryptRaw(encName, '', null, true);
+    const nameText = new TextDecoder().decode(nameData);
+    if (nameText !== PWD_HEADER_MARKER) {
+      return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+    }
+    const cipher = first._ciphertext || '';
+    const contentData = await decryptRaw(cipher, '', null, true);
+    const contentText = new TextDecoder().decode(contentData);
+    if (!contentText.startsWith(PWD_CONTENT_PREFIX)) {
+      return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+    }
+    const parts = contentText.split(':');
+    if (parts.length < 3) {
+      return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+    }
+    const saltHex = parts[1];
+    const hashHex = parts[2];
+    if (saltHex.length !== PBKDF2_SALT_LEN * 2 || hashHex.length !== PBKDF2_HASH_LEN * 2) {
+      return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+    }
+    return { hasPwd: true, saltHex, hashHex, actualFiles: results.slice(1) };
+  } catch (e) {
+    return { hasPwd: false, saltHex: null, hashHex: null, actualFiles: results };
+  }
+}
+
+async function verifyPassword(password, saltHex, hashHex) {
+  try {
+    const salt = new Uint8Array(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    const storedHash = new Uint8Array(hashHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    const computed = await derivePasswordHash(password, salt);
+    for (let i = 0; i < PBKDF2_HASH_LEN; i++) {
+      if (computed[i] !== storedHash[i]) return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function hasPasswordHeader(encName) {
+  return encName && encName.startsWith('pwd:');
+}
+
+function stripPasswordHeader(encName) {
+  if (!encName || !encName.startsWith('pwd:')) return { stripped: encName, hasHeader: false };
+  const parts = encName.split(':');
+  if (parts.length < 4) return { stripped: encName, hasHeader: false };
+  const saltHex = parts[1];
+  const hashHex = parts[2];
+  const remaining = parts.slice(3).join(':');
+  if (saltHex.length !== PBKDF2_SALT_LEN * 2 || hashHex.length !== PBKDF2_HASH_LEN * 2) {
+    return { stripped: encName, hasHeader: false };
+  }
+  return { stripped: remaining, hasHeader: true, saltHex, hashHex };
+}
+
+function mixDigitsInplace(digits, ks) { for (let i=0;i<digits.length;i++) digits[i]=(digits[i]+ks[i%ks.length])%BASE; }
+function unmixDigitsInplace(digits, ks) { for (let i=0;i<digits.length;i++) digits[i]=(digits[i]-ks[i%ks.length]+BASE)%BASE; }
+
+// ======================== v6 前缀式密码头 ========================
+const PWD_HEADER_SEPARATOR = ' ';
+const PWD_HEADER_PLAINTEXT_LEN = PWD_CONTENT_PREFIX.length + PBKDF2_SALT_LEN * 2 + 1 + PBKDF2_HASH_LEN * 2;
+const PWD_HEADER_CIPHER_LEN = PWD_HEADER_PLAINTEXT_LEN * 2;
+
+async function makePasswordHeader(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(PBKDF2_SALT_LEN));
+  const hash = await derivePasswordHash(password, salt);
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = Array.from(hash).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${PWD_CONTENT_PREFIX}${saltHex}:${hashHex}`;
+}
+
+function parsePasswordHeader(headerText) {
+  if (!headerText.startsWith(PWD_CONTENT_PREFIX)) return null;
+  const parts = headerText.split(':');
+  if (parts.length < 3) return null;
+  const saltHex = parts[1];
+  const hashHex = parts[2];
+  if (saltHex.length !== PBKDF2_SALT_LEN * 2 || hashHex.length !== PBKDF2_HASH_LEN * 2) return null;
+  return { saltHex, hashHex };
+}
+
+function hasPasswordPrefix(content) {
+  if (content.length < PWD_HEADER_CIPHER_LEN + 1) return false;
+  return content[PWD_HEADER_CIPHER_LEN] === PWD_HEADER_SEPARATOR;
+}
+
+async function detectPasswordPrefix(content) {
+  if (!hasPasswordPrefix(content)) {
+    return { hasPwd: false, saltHex: null, hashHex: null, remaining: content };
+  }
+  try {
+    const headerCipher = content.substring(0, PWD_HEADER_CIPHER_LEN);
+    const headerData = await decryptRaw(headerCipher, '', null, true);
+    const headerText = new TextDecoder().decode(headerData);
+    const parsed = parsePasswordHeader(headerText);
+    if (!parsed) return { hasPwd: false, saltHex: null, hashHex: null, remaining: content };
+    const remaining = content.substring(PWD_HEADER_CIPHER_LEN + 1);
+    return { hasPwd: true, saltHex: parsed.saltHex, hashHex: parsed.hashHex, remaining };
+  } catch (e) {
+    return { hasPwd: false, saltHex: null, hashHex: null, remaining: content };
+  }
+}
+
+async function addPasswordPrefix(content, password, salt = null) {
+  let header;
+  if (salt) {
+    const hash = await derivePasswordHash(password, salt);
+    const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = Array.from(hash).map(b => b.toString(16).padStart(2, '0')).join('');
+    header = `${PWD_CONTENT_PREFIX}${saltHex}:${hashHex}`;
+  } else {
+    header = await makePasswordHeader(password);
+  }
+  const headerBytes = new TextEncoder().encode(header);
+  const headerCipher = await encryptRaw(headerBytes, '', null, true);
+  return headerCipher + PWD_HEADER_SEPARATOR + content;
+}
+
+// ======================== v7 AES-256-GCM 加解密 (HKDF 密钥派生) ========================
+async function deriveAesKey(password, salt) {
+  if (!password || !password.trim()) return new Uint8Array(32).fill(0);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password), 'HKDF', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'HKDF', salt: salt || new Uint8Array(0), info: new TextEncoder().encode('KJK-AES-GCM-v7'), hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  return new Uint8Array(bits);
+}
+
+async function importAesKey(rawKey) {
+  return await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+}
+
+async function encryptRaw_v7(bytes, key) {
+  const nonce = crypto.getRandomValues(new Uint8Array(12));
+  const cryptoKey = await importAesKey(key);
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, cryptoKey, bytes);
+  const combined = new Uint8Array(nonce.length + ciphertext.byteLength);
+  combined.set(nonce);
+  combined.set(new Uint8Array(ciphertext), nonce.length);
+  return combined;
+}
+
+async function decryptRaw_v7(ciphertext, key) {
+  const digits = tokensToDigits(ciphertext);
+  const combined = digitsToBytes(digits);
+  if (combined.length < 12 + 16) throw new Error('Ciphertext too short');
+  const nonce = combined.slice(0, 12);
+  const ct = combined.slice(12);
+  const cryptoKey = await importAesKey(key);
+  const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, cryptoKey, ct);
+  return new Uint8Array(plaintext);
+}
+
+async function encryptRaw(bytes, password, salt = null, legacy = false, onProgress) {
+  if (onProgress) onProgress(0.05);
+  if (legacy) {
+    const digits = bytesToDigits(bytes);
+    if (onProgress) onProgress(0.3);
+    if (password && password.trim()) { const ks = await deriveKeystream(password, digits.length); mixDigitsInplace(digits, ks); }
+    if (onProgress) onProgress(0.75);
+    const result = digitsToTokens(digits);
+    if (onProgress) onProgress(1.0);
+    return result;
+  }
+  const key = await deriveAesKey(password, salt || new Uint8Array(0));
+  if (onProgress) onProgress(0.25);
+  const combined = await encryptRaw_v7(bytes, key);
+  if (onProgress) onProgress(0.75);
+  const digits = bytesToDigits(combined);
+  if (onProgress) onProgress(0.9);
+  const result = digitsToTokens(digits);
+  if (onProgress) onProgress(1.0);
+  return result;
+}
+
+async function decryptRaw(ciphertext, password, salt = null, legacy = false, onProgress) {
+  if (onProgress) onProgress(0.1);
+  if (legacy) {
+    const digits = tokensToDigits(ciphertext);
+    if (onProgress) onProgress(0.4);
+    if (password && password.trim()) { const ks = await deriveKeystream(password, digits.length); unmixDigitsInplace(digits, ks); }
+    if (onProgress) onProgress(0.85);
+    return digitsToBytes(digits);
+  }
+  try {
+    const key = await deriveAesKey(password, salt || new Uint8Array(0));
+    if (onProgress) onProgress(0.3);
+    const data = await decryptRaw_v7(ciphertext, key);
+    if (onProgress) onProgress(1.0);
+    return data;
+  } catch (e) {
+    return decryptRaw(ciphertext, password, salt, true, onProgress);
+  }
+}
+
+function saltFromHex(saltHex) {
+  if (!saltHex) return null;
+  return new Uint8Array(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+}
+
+async function encrypt(bytes, password, onProgress) {
+  if (password && password.trim()) {
+    const header = await makePasswordHeader(password);
+    const parsed = parsePasswordHeader(header);
+    const salt = saltFromHex(parsed.saltHex);
+    const contentCipher = await encryptRaw(bytes, password, salt, false, onProgress);
+    const headerBytes = new TextEncoder().encode(header);
+    const headerCipher = await encryptRaw(headerBytes, '', null, true);
+    return headerCipher + PWD_HEADER_SEPARATOR + contentCipher;
+  }
+  return encryptRaw(bytes, '', null, false, onProgress);
+}
+
+async function decrypt(ciphertext, password, onProgress) {
+  if (hasPasswordPrefix(ciphertext)) {
+    const headerCipher = ciphertext.substring(0, PWD_HEADER_CIPHER_LEN);
+    const contentCipher = ciphertext.substring(PWD_HEADER_CIPHER_LEN + 1);
+    const headerData = await decryptRaw(headerCipher, '', null, true);
+    const headerText = new TextDecoder().decode(headerData);
+    const parsed = parsePasswordHeader(headerText);
+    if (parsed) {
+      const valid = await verifyPassword(password, parsed.saltHex, parsed.hashHex);
+      if (!valid) throw new Error('密码错误');
+    }
+    const salt = parsed ? saltFromHex(parsed.saltHex) : null;
+    return decryptRaw(contentCipher, password, salt, false, onProgress);
+  }
+  return decryptRaw(ciphertext, password, null, false, onProgress);
+}
+
+// ======================== Gzip Compression ========================
+async function compressCiphertext(text) {
+  const cs = new CompressionStream('deflate');
+  const writer = cs.writable.getWriter();
+  const reader = cs.readable.getReader();
+  writer.write(new TextEncoder().encode(text));
+  writer.close();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const compressed = new Uint8Array(chunks.reduce((a, b) => a + b.length, 0));
+  let offset = 0;
+  for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
+  return btoa(String.fromCharCode(...compressed));
+}
+
+async function decompressCiphertext(b64data) {
+  const binary = atob(b64data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  async function tryDecompress(format) {
+    const ds = new DecompressionStream(format);
+    const writer = ds.writable.getWriter();
+    const reader = ds.readable.getReader();
+    writer.write(bytes);
+    writer.close();
+    const chunks = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+    const totalLen = chunks.reduce((a, b) => a + b.length, 0);
+    const result = new Uint8Array(totalLen);
+    let off = 0;
+    for (const ch of chunks) { result.set(ch, off); off += ch.length; }
+    return new TextDecoder().decode(result);
+  }
+  try {
+    return await tryDecompress('deflate');
+  } catch (e) {
+    try {
+      return await tryDecompress('gzip');
+    } catch (e2) {
+      return b64data;
+    }
+  }
+}
+
+async function encryptFilename(name, ext, password, salt = null) {
+  const original = ext ? name+'.'+ext : name;
+  const data = new TextEncoder().encode(original);
+  const encrypted = await encryptRaw(data, password, salt);
+  return encrypted;
+}
+
+async function decryptFilename(ciphertext, password, salt = null) {
+  const data = await decryptRaw(ciphertext, password, salt);
+  const text = new TextDecoder().decode(data);
+  const dotIdx = text.lastIndexOf('.');
+  if (dotIdx > 0) return [text.slice(0, dotIdx), text.slice(dotIdx+1)];
+  return [text, ''];
+}
+
+function filenameLooksValid(name) {
+  if (!name) return false;
+  for (const ch of name) {
+    const c = ch.charCodeAt(0);
+    if (c < 32 && c !== 9 && c !== 10 && c !== 13) return false;
+  }
+  return true;
+}
+
+async function tryDecryptItem(item, password, salt = null) {
+  try {
+    if (item.enc_name) {
+      const [name, ext] = await decryptFilename(item.enc_name, password, salt);
+      if (!filenameLooksValid(name)) return { success: false, error: 'wrong password' };
+      item.ext = ext;
+      item.originalName = ext ? `${name}.${ext}` : name;
+    } else {
+      item.ext = '';
+      item.originalName = 'decrypted_text';
+    }
+    const legacy = item._kjkv7 === false;
+    item.bytes = await decryptRaw(item._ciphertext, password, salt, legacy);
+    item.blob = new Blob([item.bytes], { type: getMimeType(item.ext) });
+    item._needs_password = false;
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+// ======================== File Handling ========================
+function handleEncryptFiles(files) {
+  encryptFiles = [];
+  for (const file of files) {
+    encryptFiles.push({ file, path: file.name });
+  }
+  renderEncryptFileList();
+  if (files.length > 0) showToast(`${files.length} ${t('filesSelected')}`);
+}
+
+function handleEncryptFolder(files) {
+  encryptFiles = [];
+  for (const file of files) {
+    const path = file.webkitRelativePath || file.name;
+    encryptFiles.push({ file, path });
+  }
+  renderEncryptFileList();
+  if (files.length > 0) showToast(`${files.length} ${t('filesSelected')}`);
+}
+
+function getEncryptFileIcon(path) {
+  if (path.endsWith('/')) return '📁';
+  const ext = path.split('.').pop().toLowerCase();
+  return getFileEmojiIcon(ext);
+}
+
+function renderEncryptFileList() {
+  const container = document.getElementById('encryptFileList');
+  if (encryptFiles.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  encryptFiles.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'file-item fade-in';
+    div.innerHTML = `
+      <div class="file-item-info">
+        <span class="file-item-icon">${getEncryptFileIcon(item.path)}</span>
+        <span class="file-item-name">${escapeHtml(item.path)}</span>
+        <span class="file-item-size">${formatSize(item.file.size)}</span>
+      </div>
+      <span class="file-item-status pending" data-i18n="pending">Pending</span>
+      <button class="btn btn-ghost btn-sm" onclick="removeEncryptFile(${i})" style="color:var(--danger)">&times;</button>
+    `;
+    fragment.appendChild(div);
+  });
+  container.innerHTML = '';
+  container.appendChild(fragment);
+  applyI18n();
+}
+
+function removeEncryptFile(idx) {
+  encryptFiles.splice(idx, 1);
+  renderEncryptFileList();
+}
+
+async function traverseEntry(entry, path = '') {
+  const results = [];
+  if (entry.isFile) {
+    const file = await new Promise((resolve, reject) => entry.file(resolve, reject));
+    results.push({ file, path: path ? path + '/' + entry.name : entry.name });
+  } else if (entry.isDirectory) {
+    const dirReader = entry.createReader();
+    const entries = await new Promise((resolve, reject) => dirReader.readEntries(resolve, reject));
+    const dirPath = path ? path + '/' + entry.name : entry.name;
+    if (entries.length === 0) {
+      results.push({ file: new File([], entry.name + '/'), path: dirPath + '/' });
+    }
+    for (const child of entries) {
+      results.push(...await traverseEntry(child, dirPath));
+    }
+  }
+  return results;
+}
+
+function handleDecryptFiles(files) {
+  decryptFiles = [];
+  for (const file of files) {
+    if (file.name.endsWith('.kjk') || file.name.endsWith('.KJK')) {
+      decryptFiles.push(file);
+    }
+  }
+  renderDecryptFileList();
+  if (decryptFiles.length > 0) {
+    showToast(`${decryptFiles.length} .kjk ${t('filesSelected')}`);
+    doDecrypt();
+  }
+}
+
+function renderDecryptFileList() {
+  const container = document.getElementById('decryptFileList');
+  if (decryptFiles.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = decryptFiles.map((f, i) => `
+    <div class="file-item fade-in">
+      <div class="file-item-info">
+        <span class="file-item-icon">${getFileEmojiIcon(f.name.split('.').pop().toLowerCase())}</span>
+        <span class="file-item-name">${escapeHtml(f.name)}</span>
+        <span class="file-item-size">${formatSize(f.size)}</span>
+      </div>
+      <span class="file-item-status pending" id="decryptStatus_${i}" data-i18n="pending">Pending</span>
+    </div>
+  `).join('');
+  applyI18n();
+}
+
+// ======================== Performance Helpers ========================
+const CHUNK_SIZE = 1024 * 1024;
+// KJKv8 大文件分块: 超过该大小的文件拆分为多个独立加密的 part,限制单条内存占用
+const PART_PLAINTEXT_SIZE = 4 * 1024 * 1024;
+const PART_MANIFEST_FLAG = 'M';
+const PART_ENTRY_FLAG = '8';
+
+async function readFileAsBytes(file, onProgress) {
+  if (file.size <= CHUNK_SIZE) {
+    const buf = await file.arrayBuffer();
+    if (onProgress) onProgress(1);
+    return new Uint8Array(buf);
+  }
+  const total = file.size;
+  const result = new Uint8Array(total);
+  let offset = 0;
+  let lastReport = 0;
+  while (offset < total) {
+    const slice = file.slice(offset, Math.min(offset + CHUNK_SIZE, total));
+    const buf = await slice.arrayBuffer();
+    result.set(new Uint8Array(buf), offset);
+    offset += buf.byteLength;
+    const now = performance.now();
+    if (now - lastReport > 100) {
+      if (onProgress) onProgress(offset / total);
+      lastReport = now;
+    }
+  }
+  if (onProgress) onProgress(1);
+  return result;
+}
+
+function createDebouncedProgress(updateFn, interval = 100) {
+  let last = 0;
+  let pending = null;
+  return (p) => {
+    const now = performance.now();
+    if (now - last > interval) {
+      updateFn(p);
+      last = now;
+    } else {
+      clearTimeout(pending);
+      pending = setTimeout(() => { updateFn(p); last = performance.now(); }, interval);
+    }
+  };
+}
+
+// ======================== Encrypt Logic ========================
+function getTopLevelGroup(path) {
+  const p = path.replace(/\/$/, '');
+  const slash = p.indexOf('/');
+  return slash > 0 ? p.slice(0, slash) : p;
+}
+
+function buildEncryptGroups() {
+  if (encryptFiles.length === 0) return { '_text': [] };
+  const groups = {};
+  for (const item of encryptFiles) {
+    const key = getTopLevelGroup(item.path);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(item);
+  }
+  return groups;
+}
+
+async function buildPackageFromTasks(tasks, password, sharedSalt, hasPwd, onProgress) {
+  const fileData = [];
+  let totalSize = 0;
+  for (const task of tasks) {
+    totalSize += task.isDir ? 0 : (task.file ? task.file.size : (task.data ? task.data.length : 0));
+  }
+  let processedSize = 0;
+  let hasChunked = false;
+  const report = (() => {
+    let last = 0;
+    return () => {
+      if (!onProgress) return;
+      const now = performance.now();
+      if (now - last > 100) { onProgress(processedSize / totalSize); last = now; }
+    };
+  })();
+  for (const task of tasks) {
+    if (task.isDir) {
+      const encName = await encryptFilename(task.name, '', password, sharedSalt);
+      fileData.push({ enc_name: encName, ciphertext: '', size: 0, name: task.name, ext: '' });
+      continue;
+    }
+    const taskSize = task.file ? task.file.size : (task.data ? task.data.length : 0);
+    if (task.file && taskSize > PART_PLAINTEXT_SIZE) {
+      // 大文件分块: 从 File 分段读取,每个 part 单独 AES-GCM 加密
+      hasChunked = true;
+      const encName = await encryptFilename(task.name, task.ext, password, sharedSalt);
+      const parts = [];
+      let offset = 0;
+      while (offset < taskSize) {
+        const end = Math.min(offset + PART_PLAINTEXT_SIZE, taskSize);
+        const buf = await task.file.slice(offset, end).arrayBuffer();
+        const chunk = new Uint8Array(buf);
+        const cipher = await encryptRaw(chunk, password, sharedSalt, false);
+        parts.push({ enc_name: encName, ciphertext: cipher, size: chunk.length });
+        processedSize += chunk.length;
+        offset = end;
+        report();
+      }
+      fileData.push({ enc_name: encName, size: taskSize, parts, name: task.name, ext: task.ext });
+    } else {
+      const data = task.file ? new Uint8Array(await task.file.arrayBuffer()) : task.data;
+      const cipher = await encryptRaw(data, password, sharedSalt, false);
+      const encName = await encryptFilename(task.name, task.ext, password, sharedSalt);
+      fileData.push({ enc_name: encName, ciphertext: cipher, size: data.length, name: task.name, ext: task.ext });
+      processedSize += data.length;
+    }
+    report();
+  }
+  const kjkLines = [hasChunked ? 'KJKv8' : 'KJKv7', String(fileData.length)];
+  for (const fd of fileData) {
+    if (fd.parts) {
+      kjkLines.push(`${fd.enc_name}|${PART_MANIFEST_FLAG}|${fd.size}|${fd.parts.length}|${PART_PLAINTEXT_SIZE}|`);
+      for (const p of fd.parts) {
+        const compB64 = await compressCiphertext(p.ciphertext);
+        kjkLines.push(`${p.enc_name||fd.enc_name}|${PART_ENTRY_FLAG}|${p.size}|${compB64}`);
+      }
+    } else {
+      const compB64 = await compressCiphertext(fd.ciphertext);
+      kjkLines.push(`${fd.enc_name||''}|${hasChunked ? PART_ENTRY_FLAG : '7'}|${fd.size||0}|${compB64}`);
+    }
+  }
+  let kjkContent = kjkLines.join('\n');
+  if (hasPwd) {
+    kjkContent = await addPasswordPrefix(kjkContent, password, sharedSalt);
+  }
+  return kjkContent;
+}
+
+// ======================== KJKv9 Binary Format (与桌面版 C 引擎逐字节互通) ========================
+// 布局: [64B 头][数据块区域][目录密文 blob]
+//  头:  'KJK9' u16ver u16flags u32kdf_iter u64dir_offset u32dir_len salt16 dirNonce12 保留12
+//  块:  [nonce12][AES-256-GCM 密文][tag16], 每块明文 ≤ 4MB
+//  目录: AES-GCM 加密的 JSON {"v":9,"files":[{p,s,m,b:[[off,csize]...]}],"free":[...]}
+//  KDF: PBKDF2-HMAC-SHA256(password, salt, 600000) → 32B AES-256 密钥
+const KJK9 = {
+  MAGIC: 'KJK9', VERSION: 9, HEADER_SIZE: 64, BLOCK_SIZE: 4 * 1024 * 1024,
+  KDF_ITER: 600000, NONCE_SIZE: 12, TAG_SIZE: 16, FLAG_HAS_PASSWORD: 1,
+};
+const KJK9_OVERHEAD = KJK9.NONCE_SIZE + KJK9.TAG_SIZE;
+
+function kjk9IsKjk9(buf) {
+  if (!buf || buf.byteLength < KJK9.HEADER_SIZE) return false;
+  return String.fromCharCode(...new Uint8Array(buf, 0, 4)) === 'KJK9';
+}
+
+function kjk9ParseHeader(buf) {
+  if (String.fromCharCode(...new Uint8Array(buf, 0, 4)) !== 'KJK9') throw new Error('Not KJKv9');
+  const dv = new DataView(buf);
+  return {
+    ver: dv.getUint16(4, true),
+    flags: dv.getUint16(6, true),
+    kdfIter: dv.getUint32(8, true),
+    dirOffset: Number(dv.getBigUint64(12, true)),
+    dirLen: dv.getUint32(20, true),
+    salt: new Uint8Array(buf, 24, 16),
+    dirNonce: new Uint8Array(buf, 40, 12),
+  };
+}
+
+async function kjk9DeriveKey(password, salt, iter) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password || ''), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: iter || KJK9.KDF_ITER, hash: 'SHA-256' },
+    keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+async function kjk9Seal(key, data) {
+  const nonce = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, key, data));
+  const out = new Uint8Array(12 + ct.length);
+  out.set(nonce, 0);
+  out.set(ct, 12);
+  return out;
+}
+
+async function kjk9Open(key, blob) {
+  if (blob.length < KJK9_OVERHEAD) throw new Error('block too short');
+  const nonce = blob.slice(0, 12);
+  const ct = blob.slice(12);
+  return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, key, ct));
+}
+
+function kjk9BlocksOf(size, startOff) {
+  const blocks = [];
+  let off = startOff, remaining = size;
+  while (remaining > 0) {
+    const n = Math.min(KJK9.BLOCK_SIZE, remaining);
+    blocks.push([off, n + KJK9_OVERHEAD]);
+    off += n + KJK9_OVERHEAD;
+    remaining -= n;
+  }
+  return blocks;
+}
+
+function kjk9TotalCsize(size) {
+  const n = size ? Math.ceil(size / KJK9.BLOCK_SIZE) : 0;
+  return n ? size + n * KJK9_OVERHEAD : 0;
+}
+
+function kjk9MakeHeader(salt, flags, dirOffset, dirLen, dirNonce) {
+  const h = new Uint8Array(KJK9.HEADER_SIZE);
+  const dv = new DataView(h.buffer);
+  new TextEncoder().encode('KJK9').forEach((b, i) => { h[i] = b; });
+  dv.setUint16(4, KJK9.VERSION, true);
+  dv.setUint16(6, flags, true);
+  dv.setUint32(8, KJK9.KDF_ITER, true);
+  dv.setBigUint64(12, BigInt(dirOffset), true);
+  dv.setUint32(20, dirLen, true);
+  h.set(salt, 24);
+  h.set(dirNonce || crypto.getRandomValues(new Uint8Array(12)), 40);
+  return h;
+}
+
+function kjk9TaskRel(t) {
+  if (t.path) return t.path.replace(/^\/+/, '').replace(/\/$/, '');
+  return (t.name || '') + (t.ext ? '.' + t.ext : '');
+}
+
+// —— 加密: tasks → KJKv9 Blob (与桌面 encrypt_entries_to_kjk9 布局一致) ——
+async function buildPackageV9(tasks, password, onProgress) {
+  const hasPwd = !!password.trim();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await kjk9DeriveKey(password, salt, KJK9.KDF_ITER);
+  const fileTasks = tasks.filter(t => !t.isDir);
+  let totalPlain = 0;
+  for (const t of fileTasks) totalPlain += t.file ? t.file.size : (t.data ? t.data.length : 0);
+  let processed = 0;
+  const report = () => {
+    if (onProgress && totalPlain) onProgress(Math.min(1, processed / totalPlain));
+  };
+
+  const parts = [];
+  const dirFiles = [];
+  let off = KJK9.HEADER_SIZE;
+  for (const t of fileTasks) {
+    const rel = kjk9TaskRel(t);
+    const size = t.file ? t.file.size : (t.data ? t.data.length : 0);
+    const mtime = t.file ? Math.floor((t.file.lastModified || Date.now()) / 1000) : Math.floor(Date.now() / 1000);
+    const blocks = kjk9BlocksOf(size, off);
+    let pos = 0;
+    for (const [, csize] of blocks) {
+      const plainLen = csize - KJK9_OVERHEAD;
+      let chunk;
+      if (t.file) {
+        chunk = new Uint8Array(await t.file.slice(pos, pos + plainLen).arrayBuffer());
+      } else {
+        chunk = (t.data || new Uint8Array(0)).slice(pos, pos + plainLen);
+      }
+      parts.push(await kjk9Seal(key, chunk));
+      processed += plainLen;
+      pos += plainLen;
+      report();
+    }
+    dirFiles.push({ p: rel, s: size, m: mtime, b: blocks });
+    off += kjk9TotalCsize(size);
+  }
+
+  const dir = { v: 9, files: dirFiles, free: [] };
+  const dirBlob = await kjk9Seal(key, new TextEncoder().encode(JSON.stringify(dir)));
+  const header = kjk9MakeHeader(salt, hasPwd ? 1 : 0, off, dirBlob.length);
+  return { blob: new Blob([header, ...parts, dirBlob]), dirFiles, hasPwd };
+}
+
+// —— 解密: 读目录 → 条目(内容按需解密) ——
+async function parseKjkV9(buf, pwd) {
+  const hdr = kjk9ParseHeader(buf);
+  const hasPwd = !!(hdr.flags & KJK9.FLAG_HAS_PASSWORD);
+  if (hasPwd && !pwd) {
+    return [{
+      ext: '', originalName: '(password needed)', bytes: new Uint8Array(), blob: new Blob([]),
+      _needsPassword: true, _kjk9: true, _kjk9Buf: buf, _kjk9Header: hdr,
+    }];
+  }
+  let key, dir;
+  try {
+    key = await kjk9DeriveKey(pwd || '', hdr.salt, hdr.kdfIter);
+    const dirBlob = new Uint8Array(buf, hdr.dirOffset, hdr.dirLen);
+    dir = JSON.parse(new TextDecoder().decode(await kjk9Open(key, dirBlob)));
+  } catch {
+    return [{
+      ext: '', originalName: pwd ? '(wrong password)' : '(password needed)',
+      bytes: new Uint8Array(), blob: new Blob([]),
+      _needsPassword: true, _kjk9: true, _kjk9Buf: buf, _kjk9Header: hdr,
+    }];
+  }
+  const session = { buf, key, hdr, dir, hasPwd, pwd: pwd || '' };
+  const items = [];
+  for (const f of dir.files || []) {
+    const p = f.p || 'unknown';
+    const dot = p.lastIndexOf('.'), slash = p.lastIndexOf('/');
+    const ext = dot > slash ? p.slice(dot + 1) : '';
+    items.push({
+      ext, originalName: p, bytes: new Uint8Array(), blob: new Blob([]),
+      _needsPassword: false, _kjk9: true, _kjk9Buf: buf, _kjk9Header: hdr,
+      _kjk9Key: key, _kjk9Blocks: (f.b || []).map(x => [Number(x[0]), Number(x[1])]),
+      _kjk9Size: f.s, _kjk9M: f.m, _kjk9Session: session,
+    });
+  }
+  return items;
+}
+
+// 按需解密单个条目(预览/下载时才处理, 避免整包入内存)
+async function ensureKjk9Item(item) {
+  if (!item._kjk9 || item._kjk9Done) return;
+  const total = item._kjk9Blocks.reduce((a, b) => a + (b[1] - KJK9_OVERHEAD), 0);
+  const out = new Uint8Array(total);
+  let pos = 0;
+  for (const [off, csize] of item._kjk9Blocks) {
+    const block = new Uint8Array(item._kjk9Buf, off, csize);
+    const plain = await kjk9Open(item._kjk9Key, block);
+    out.set(plain, pos);
+    pos += plain.length;
+  }
+  item.bytes = out;
+  item.blob = new Blob([out], { type: getMimeType(item.ext) });
+  item._kjk9Done = true;
+}
+
+// —— 编辑操作重建(目录+数据区不变, 仅重写头+目录 blob) ——
+function kjk9DataEnd(dir) {
+  let end = KJK9.HEADER_SIZE;
+  for (const f of dir.files) for (const [o, c] of f.b) end = Math.max(end, o + c);
+  return end;
+}
+
+async function kjk9Rebuild(session, dir) {
+  const hdr = session.hdr;
+  const dataEnd = kjk9DataEnd(dir);
+  dir.free = dir.free || [];
+  if (hdr.dirLen) dir.free.push([hdr.dirOffset, hdr.dirLen]);
+  const dirBlob = await kjk9Seal(session.key, new TextEncoder().encode(JSON.stringify(dir)));
+  const header = kjk9MakeHeader(hdr.salt, session.hasPwd ? 1 : 0, dataEnd, dirBlob.length, hdr.dirNonce);
+  const dataRegion = new Uint8Array(session.buf, KJK9.HEADER_SIZE, dataEnd - KJK9.HEADER_SIZE);
+  return new Blob([header, dataRegion, dirBlob]);
+}
+
+// 改密: 用新密钥重加密全部数据块(长度不变, 偏移不变) + 目录
+async function kjk9ChangePassword(session, newPwd) {
+  const newKey = await kjk9DeriveKey(newPwd, session.hdr.salt, session.hdr.kdfIter);
+  const hasPwd = !!newPwd.trim();
+  const dataEnd = kjk9DataEnd(session.dir);
+  const newData = new Uint8Array(dataEnd - KJK9.HEADER_SIZE);
+  for (const f of session.dir.files) {
+    for (const [off, csize] of f.b) {
+      const block = new Uint8Array(session.buf, off, csize);
+      const plain = await kjk9Open(session.key, block);
+      const sealed = await kjk9Seal(newKey, plain);
+      newData.set(sealed, off - KJK9.HEADER_SIZE);
+    }
+  }
+  const dir = session.dir;
+  dir.free = dir.free || [];
+  if (session.hdr.dirLen) dir.free.push([session.hdr.dirOffset, session.hdr.dirLen]);
+  const dirBlob = await kjk9Seal(newKey, new TextEncoder().encode(JSON.stringify(dir)));
+  const header = kjk9MakeHeader(session.hdr.salt, hasPwd ? 1 : 0, dataEnd, dirBlob.length, session.hdr.dirNonce);
+  return new Blob([header, newData, dirBlob]);
+}
+
+async function downloadKjk9Blob(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// —— 网页版包编辑: 定位当前打开的 KJKv9 会话 ——
+function kjk9ActiveSession() {
+  const it = decryptResults.find(r => r._kjk9Session);
+  return it ? it._kjk9Session : null;
+}
+
+// 编辑后: 保存新包 + 用新字节重建会话/目录树
+async function applyKjk9Edit(blob, filename) {
+  const session = kjk9ActiveSession();
+  if (!session) return;
+  downloadKjk9Blob(blob, filename || 'edited.kjk');
+  const buf = await blob.arrayBuffer();
+  session.buf = buf;
+  decryptResults = await parseKjkV9(buf, session.pwd);
+  selectedPreviewIdx = decryptResults.findIndex(r => !r._needsPassword && !r.originalName.endsWith('/'));
+  selectedTreeNode = null;
+  renderDecryptResults();
+  showToast(t('editSuccess'));
+}
+
+// 追加文件: 在数据区末尾加密新块, 目录加条目, 重建包
+async function kjk9Append(session, tasks, onProgress) {
+  const hdr = session.hdr, dir = session.dir;
+  dir.free = dir.free || [];
+  let off = kjk9DataEnd(dir);
+  const dataRegion = new Uint8Array(session.buf, KJK9.HEADER_SIZE, off - KJK9.HEADER_SIZE);
+  const extra = [], added = [];
+  let processed = 0;
+  const totalPlain = tasks.reduce((a, t) => a + (t.file ? t.file.size : (t.data ? t.data.length : 0)), 0);
+  const report = () => { if (onProgress && totalPlain) onProgress(Math.min(1, processed / totalPlain)); };
+  for (const t of tasks) {
+    const rel = kjk9TaskRel(t);
+    const size = t.file ? t.file.size : (t.data ? t.data.length : 0);
+    if (size <= 0) continue;
+    const mtime = t.file ? Math.floor((t.file.lastModified || Date.now()) / 1000) : Math.floor(Date.now() / 1000);
+    const blocks = kjk9BlocksOf(size, off);
+    let pos = 0;
+    for (const [boff, csize] of blocks) {
+      const plainLen = csize - KJK9_OVERHEAD;
+      let chunk;
+      if (t.file) chunk = new Uint8Array(await t.file.slice(pos, pos + plainLen).arrayBuffer());
+      else chunk = (t.data || new Uint8Array(0)).slice(pos, pos + plainLen);
+      extra.push(await kjk9Seal(session.key, chunk));
+      processed += plainLen;
+      pos += plainLen;
+      report();
+    }
+    added.push({ p: rel, s: size, m: mtime, b: blocks });
+    off += kjk9TotalCsize(size);
+  }
+  if (added.length === 0) return null;
+  dir.files.push(...added);
+  const total = dataRegion.length + extra.reduce((a, e) => a + e.length, 0);
+  const newRegion = new Uint8Array(total);
+  newRegion.set(dataRegion, 0);
+  let p = dataRegion.length;
+  for (const e of extra) { newRegion.set(e, p); p += e.length; }
+  const dirBlob = await kjk9Seal(session.key, new TextEncoder().encode(JSON.stringify(dir)));
+  const header = kjk9MakeHeader(hdr.salt, session.hasPwd ? 1 : 0, off, dirBlob.length, hdr.dirNonce);
+  return new Blob([header, newRegion, dirBlob]);
+}
+
+async function doEncrypt() {
+  const textInput = document.getElementById('encryptText').value.trim();
+  const password = document.getElementById('encryptPassword').value;
+  const merge = document.getElementById('mergeToggle').checked;
+  const hasPwd = !!password.trim();
+
+  if (!textInput && encryptFiles.length === 0) {
+    showToast(t('noInput'));
+    return;
+  }
+
+  const btn = document.getElementById('encryptBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span>${t('encrypting')}</span>`;
+
+  const progress = document.getElementById('encryptProgress');
+  const progressFill = document.getElementById('encryptProgressFill');
+  progress.classList.add('visible');
+
+  try {
+    let sharedSalt = null;
+    if (hasPwd) {
+      const header = await makePasswordHeader(password);
+      const parsed = parsePasswordHeader(header);
+      sharedSalt = saltFromHex(parsed.saltHex);
+    }
+
+    // 纯文本模式
+    if (encryptFiles.length === 0 && textInput) {
+      const textBytes = new TextEncoder().encode(textInput);
+      const outputContent = await encrypt(textBytes, password);
+      encryptResultData = { content: outputContent, type: 'text' };
+      encryptPackages = [];
+    } else {
+      // 构建任务列表
+      const useV9 = formatCompat === 'KJKv9' || formatCompat === 'auto';
+      const baseTasks = [];
+      if (textInput) {
+        baseTasks.push({ data: new TextEncoder().encode(textInput), name: 'untitled', ext: 'txt', path: 'untitled.txt' });
+      }
+      for (const item of encryptFiles) {
+        const path = item.path || item.file.name;
+        if (path.endsWith('/')) {
+          baseTasks.push({ data: new Uint8Array(0), name: path, ext: '', isDir: true, path });
+          continue;
+        }
+        const lastSlash = path.lastIndexOf('/');
+        const lastDot = path.lastIndexOf('.');
+        const hasExt = lastDot > lastSlash && lastDot > 0;
+        const ext = hasExt ? path.slice(lastDot + 1) : '';
+        const name = hasExt ? path.slice(0, lastDot) : path;
+        // 大文件不预载入内存,由 buildPackageFromTasks 分块读取加密
+        const data = (item.file && item.file.size > PART_PLAINTEXT_SIZE) ? null : await readFileAsBytes(item.file);
+        baseTasks.push({ file: item.file, data, name, ext, path });
+      }
+
+      if (merge || baseTasks.length <= 1) {
+        if (useV9) {
+          const pkg = await buildPackageV9(baseTasks, password, frac => {
+            progressFill.style.width = (frac * 100) + '%';
+          });
+          encryptResultData = { blob: pkg.blob, type: 'kjk9', name: 'encrypted.kjk', hasPwd: pkg.hasPwd };
+          encryptPackages = [];
+        } else {
+          const outputContent = await buildPackageFromTasks(baseTasks, password, sharedSalt, hasPwd);
+          encryptResultData = { content: outputContent, type: 'kjk' };
+          encryptPackages = [];
+        }
+      } else {
+        // 分组打包
+        const groups = buildEncryptGroups();
+        encryptPackages = [];
+        let idx = 0;
+        for (const [key, items] of Object.entries(groups)) {
+          const tasks = items.map(item => {
+            const base = baseTasks.find(t => t.file === item.file);
+            if (base) return base;
+            const path = item.path || item.file.name;
+            if (path.endsWith('/')) return { data: new Uint8Array(0), name: path, ext: '', isDir: true, path };
+            const lastSlash = path.lastIndexOf('/');
+            const lastDot = path.lastIndexOf('.');
+            const hasExt = lastDot > lastSlash && lastDot > 0;
+            const ext = hasExt ? path.slice(lastDot + 1) : '';
+            const name = hasExt ? path.slice(0, lastDot) : path;
+            return { file: item.file, data: null, name, ext, path };
+          }).filter(Boolean);
+          if (useV9) {
+            const pkg = await buildPackageV9(tasks, password, frac => {
+              progressFill.style.width = (frac * 100) + '%';
+            });
+            encryptPackages.push({ name: key + '.kjk', blob: pkg.blob, idx: idx++, hasPwd: pkg.hasPwd });
+          } else {
+            const content = await buildPackageFromTasks(tasks, password, sharedSalt, hasPwd);
+            encryptPackages.push({ name: key + '.kjk', content, idx: idx++ });
+          }
+        }
+        encryptResultData = null;
+      }
+    }
+
+    const resultDiv = document.getElementById('encryptResult');
+    resultDiv.classList.add('visible');
+    const resultText = document.getElementById('encryptResultText');
+    const packageList = document.getElementById('encryptPackageList');
+
+    if (encryptPackages.length > 0) {
+      resultText.style.display = 'none';
+      packageList.style.display = 'flex';
+      packageList.innerHTML = encryptPackages.map(pkg => `
+        <div class="package-item fade-in">
+          <div class="package-item-info">
+            <div class="package-item-name">${escapeHtml(pkg.name)}</div>
+            <div class="package-item-meta">${formatSize(new Blob([pkg.content]).size)}</div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="downloadEncryptPackage(${pkg.idx})">
+            <span data-i18n="savePackage">Save Package</span>
+          </button>
+        </div>
+      `).join('');
+      applyI18n();
+    } else {
+      resultText.style.display = 'block';
+      packageList.style.display = 'none';
+      const outputContent = encryptResultData.content;
+      resultText.textContent = outputContent.substring(0, 300) + (outputContent.length > 300 ? '...' : '');
+    }
+
+    showToast(t('encryptSuccess'));
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span data-i18n="encryptBtn">Encrypt</span>`;
+    progressFill.style.width = '0%';
+    progress.classList.remove('visible');
+    applyI18n();
+  }
+}
+
+function downloadEncryptPackage(idx) {
+  const pkg = encryptPackages.find(p => p.idx === idx);
+  if (!pkg) return;
+  if (pkg.blob) {
+    downloadKjk9Blob(pkg.blob, pkg.name);
+    showToast(t('downloadSuccess'));
+    return;
+  }
+  const blob = new Blob([pkg.content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = pkg.name;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('downloadSuccess'));
+}
+
+function downloadKjk() {
+  if (!encryptResultData) return;
+  if (encryptResultData.type === 'kjk9') {
+    downloadKjk9Blob(encryptResultData.blob, encryptResultData.name || 'encrypted.kjk');
+    showToast(t('downloadSuccess'));
+    return;
+  }
+  const blob = new Blob([encryptResultData.content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = encryptResultData.type === 'text' ? 'encrypted.txt' : 'encrypted.kjk';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('downloadSuccess'));
+}
+
+function copyResult() {
+  if (!encryptResultData) return;
+  navigator.clipboard.writeText(encryptResultData.content).then(() => showToast(t('copySuccess')));
+}
+
+function clearEncrypt() {
+  document.getElementById('encryptText').value = '';
+  encryptFiles = [];
+  encryptResultData = null;
+  encryptPackages = [];
+  document.getElementById('encryptFileList').innerHTML = '';
+  document.getElementById('encryptPackageList').innerHTML = '';
+  document.getElementById('encryptResult').classList.remove('visible');
+}
+
+// ======================== Decrypt Logic ========================
+async function doDecrypt() {
+  const textInput = document.getElementById('decryptText').value.trim();
+
+  if (decryptFiles.length === 0 && !textInput) {
+    showToast(t('noCipher'));
+    return;
+  }
+
+  const btn = document.getElementById('decryptBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span>${t('decrypting')}</span>`;
+
+  packageHasPassword = false;
+
+  async function parseAllSources(pwd) {
+    const all = [];
+    for (const file of decryptFiles) {
+      const buf = await file.arrayBuffer();
+      if (kjk9IsKjk9(buf)) {
+        all.push(...await parseKjkV9(buf, pwd));
+      } else {
+        const text = await file.text();
+        all.push(...await parseKjk(text, pwd));
+      }
+    }
+    if (textInput) {
+      const results = await parseKjk(textInput, pwd);
+      all.push(...results);
+    }
+    return all;
+  }
+
+  try {
+    decryptResults = await parseAllSources('');
+
+    const headerItem = decryptResults.find(r => r._isPasswordHeader);
+    let password = '';
+
+    if (headerItem) {
+      packageHasPassword = true;
+      password = prompt(t('enterPassword'));
+      if (!password) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>${t('decryptBtn')}</span>`;
+        return;
+      }
+      const valid = await verifyPassword(password, headerItem._saltHex, headerItem._hashHex);
+      if (!valid) {
+        showToast(t('wrongPassword'));
+        btn.disabled = false;
+        btn.innerHTML = `<span>${t('decryptBtn')}</span>`;
+        return;
+      }
+      decryptResults = await parseAllSources(password);
+    } else {
+      const needsPwd = decryptResults.some(r => r._needsPassword);
+      if (needsPwd) {
+        password = prompt(t('enterPassword'));
+        if (!password) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>${t('decryptBtn')}</span>`;
+          return;
+        }
+        decryptResults = await parseAllSources(password);
+        const stillNeedsPwd = decryptResults.some(r => r._needsPassword);
+        if (stillNeedsPwd) {
+          showToast(t('wrongPassword'));
+          btn.disabled = false;
+          btn.innerHTML = `<span>${t('decryptBtn')}</span>`;
+          return;
+        }
+      }
+    }
+
+    decryptResults = decryptResults.filter(r => !r._isPasswordHeader);
+    selectedPreviewIdx = decryptResults.findIndex(r => !r._needsPassword && !r.originalName.endsWith('/'));
+
+    renderDecryptResults();
+
+    if (decryptResults.length > 0) {
+      const resultDiv = document.getElementById('decryptResult');
+      resultDiv.classList.add('visible');
+      document.getElementById('decryptActions').style.display = 'flex';
+      document.getElementById('decryptToolbar').style.display = 'flex';
+      document.getElementById('decryptStatusBar').style.display = 'flex';
+      showToast(t('decryptSuccess'));
+    } else {
+      showToast(t('invalidKjk'));
+    }
+  } catch (e) {
+    showToast(t('invalidKjk') + ': ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>${t('decryptBtn')}</span>`;
+  }
+}
+
+async function reDecryptItem(idx) {
+  const password = prompt(t('enterPassword'));
+  if (!password) return;
+  const item = decryptResults[idx];
+  try {
+    if (hasPasswordHeader(item.enc_name)) {
+      const { valid, remaining } = await verifyPasswordHeader(item.enc_name, password);
+      if (!valid) { showToast(t('wrongPassword')); return; }
+    }
+    const salt = saltFromHex(item._saltHex);
+    const legacy = item._kjkv7 === false;
+    const data = await decryptRaw(item._ciphertext, password, salt, legacy);
+    item.bytes = data;
+    item.blob = new Blob([data], { type: getMimeType(item.ext) });
+    if (item.enc_name) {
+      const encNameToUse = hasPasswordHeader(item.enc_name)
+        ? (await verifyPasswordHeader(item.enc_name, password)).remaining
+        : item.enc_name;
+      if (encNameToUse) {
+        try {
+          const [dn, de] = await decryptFilename(encNameToUse, password, salt);
+          if (filenameLooksValid(dn)) {
+            item.originalName = de ? `${dn}.${de}` : dn;
+            item.ext = de;
+          }
+        } catch { /* ignore */ }
+      }
+    }
+    item._needsPassword = false;
+    renderDecryptResults();
+    showToast(t('decryptSuccess'));
+  } catch (e) {
+    showToast(t('wrongPassword') + ': ' + e.message);
+  }
+}
+
+function togglePwdVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? '\u{1F441}' : '\u{1F576}';
+}
+
+function isRawCiphertext(text) {
+  text = text.trim();
+  if (!text) return false;
+  const tokenSet = new Set(TOKENS);
+  let parts;
+  if (text.includes(' ')) {
+    parts = text.split(/\s+/).filter(Boolean);
+  } else {
+    parts = Array.from(text).filter(ch => !/\s/.test(ch));
+  }
+  if (parts.length < 4) return false;
+  let matched = 0;
+  for (const p of parts) {
+    if (tokenSet.has(p)) matched++;
+  }
+  return matched > parts.length * 0.9;
+}
+
+async function guessPasswordNeeded(enc_name) {
+  if (!enc_name) return false;
+  try {
+    const [name] = await decryptFilename(enc_name, '', null);
+    return !filenameLooksValid(name);
+  } catch { return true; }
+}
+
+async function parseKjk(content, password = '') {
+  let v6PrefixInfo = null;
+  let parseContent = content;
+  if (hasPasswordPrefix(content)) {
+    const detection = await detectPasswordPrefix(content);
+    if (detection.hasPwd) {
+      v6PrefixInfo = { saltHex: detection.saltHex, hashHex: detection.hashHex };
+      parseContent = detection.remaining;
+    }
+  }
+
+  // 兼容桌面版 Windows 保存的 \r\n 换行
+  const lines = parseContent.replace(/\r/g, '').trim().split('\n');
+
+  if (lines[0] === 'KJKv8' || lines[0] === 'KJKv7' || lines[0] === 'KJKv5') {
+    const version = lines[0];
+    const isV7 = version === 'KJKv7' || version === 'KJKv8';
+    const count = parseInt(lines[1], 10);
+    if (isNaN(count) || count < 1) throw new Error('Invalid count');
+
+    const rawEntries = [];
+    let li = 2;
+    let parsed = 0;
+    while (parsed < count && li < lines.length) {
+      const line = lines[li];
+      if (!line) { li++; continue; }
+      const parts = line.split('|');
+      if (parts.length < 4) { li++; continue; }
+      const flag = parts[1] || '0';
+      if (version === 'KJKv8' && flag === PART_MANIFEST_FLAG && parts.length >= 6) {
+        // KJKv8 大文件: manifest + 后续 part 行
+        const enc_name = parts[0] || '';
+        const part_count = parseInt(parts[3], 10) || 0;
+        const partEntries = [];
+        let j = li + 1;
+        let collected = 0;
+        while (j < lines.length && collected < part_count) {
+          const pl = lines[j].split('|');
+          if (pl.length >= 4 && pl[1] === PART_ENTRY_FLAG) {
+            const compB64 = pl.slice(3).join('|');
+            const ciphertext = await decompressCiphertext(compB64);
+            partEntries.push({ enc_name: pl[0] || '', flag: PART_ENTRY_FLAG, size: parseInt(pl[2], 10) || 0, _ciphertext: ciphertext, _kjkv7: true });
+            collected++;
+          }
+          j++;
+        }
+        rawEntries.push({ enc_name, flag: PART_MANIFEST_FLAG, _parts: partEntries, _chunked: true, _kjkv7: true });
+        li = j;
+        parsed++;
+        continue;
+      }
+      const enc_name = parts[0] || '';
+      const compB64 = parts.slice(3).join('|');
+      const ciphertext = await decompressCiphertext(compB64);
+      rawEntries.push({ enc_name, flag, _ciphertext: ciphertext, _kjkv7: isV7 || flag === '7' || flag === PART_ENTRY_FLAG });
+      li++;
+      parsed++;
+    }
+
+    let pwdHeaderInfo = null;
+    let actualEntries = rawEntries;
+    let headerEntry = null;
+
+    if (v6PrefixInfo) {
+      pwdHeaderInfo = { saltHex: v6PrefixInfo.saltHex, hashHex: v6PrefixInfo.hashHex, newFormat: true, isV6Prefix: true };
+    } else if (rawEntries.length > 0) {
+      const detection = await detectPasswordHeader(rawEntries);
+      if (detection.hasPwd) {
+        pwdHeaderInfo = { saltHex: detection.saltHex, hashHex: detection.hashHex, newFormat: true };
+        headerEntry = rawEntries[0];
+        actualEntries = detection.actualFiles;
+      }
+    }
+
+    if (!pwdHeaderInfo && actualEntries.length > 0) {
+      const first = actualEntries[0];
+      if (hasPasswordHeader(first.enc_name)) {
+        const { stripped, hasHeader, saltHex, hashHex } = stripPasswordHeader(first.enc_name);
+        if (hasHeader) {
+          pwdHeaderInfo = { saltHex, hashHex, newFormat: false };
+          first.enc_name = stripped;
+        }
+      }
+    }
+
+    let passwordValid = true;
+    if (pwdHeaderInfo && password && password.trim()) {
+      passwordValid = await verifyPassword(password, pwdHeaderInfo.saltHex, pwdHeaderInfo.hashHex);
+    }
+
+    const saltBytes = pwdHeaderInfo ? saltFromHex(pwdHeaderInfo.saltHex) : null;
+    const results = [];
+
+    if (headerEntry) {
+      results.push({
+        ext: '', originalName: '(password header)', bytes: new Uint8Array(),
+        blob: new Blob([]), _needsPassword: false, _ciphertext: headerEntry._ciphertext,
+        enc_name: headerEntry.enc_name, _isPasswordHeader: true,
+        _saltHex: pwdHeaderInfo.saltHex, _hashHex: pwdHeaderInfo.hashHex,
+      });
+    } else if (v6PrefixInfo) {
+      results.push({
+        ext: '', originalName: '(password header)', bytes: new Uint8Array(),
+        blob: new Blob([]), _needsPassword: false, _ciphertext: '',
+        enc_name: '', _isPasswordHeader: true, _isPasswordPrefixHeader: true,
+        _saltHex: v6PrefixInfo.saltHex, _hashHex: v6PrefixInfo.hashHex,
+      });
+    }
+
+    for (const entry of actualEntries) {
+      let needsPwd = false, origName = '(encrypted)', decExt = '', data = new Uint8Array();
+      const entryIsV7 = entry._kjkv7;
+      const legacy = !entryIsV7;
+
+      if (pwdHeaderInfo && !password) {
+        needsPwd = true;
+        origName = '(password needed)';
+      } else if (pwdHeaderInfo && !passwordValid) {
+        needsPwd = true;
+        origName = '(wrong password)';
+      } else {
+        try {
+          data = await decryptRaw(entry._ciphertext, password, saltBytes, legacy);
+          if (entry.enc_name) {
+            try {
+              const [dn, de] = await decryptFilename(entry.enc_name, password, saltBytes);
+              if (filenameLooksValid(dn)) { origName = de ? `${dn}.${de}` : dn; decExt = de; }
+              else { needsPwd = !!pwdHeaderInfo; origName = needsPwd ? '(password needed)' : '(decrypted)'; }
+            } catch {
+              needsPwd = !!pwdHeaderInfo;
+              origName = needsPwd ? '(password needed)' : '(decrypted)';
+            }
+          }
+        } catch {
+          needsPwd = !!pwdHeaderInfo;
+          origName = needsPwd ? '(password needed)' : '(decryption failed)';
+        }
+      }
+
+      results.push({ ext: decExt, originalName: origName, bytes: data,
+        blob: new Blob([data], { type: getMimeType(decExt) }),
+        _needsPassword: needsPwd, _ciphertext: entry._ciphertext, enc_name: entry.enc_name,
+        _saltHex: pwdHeaderInfo ? pwdHeaderInfo.saltHex : null, _kjkv7: entryIsV7 });
+    }
+
+    return results;
+  }
+
+  if (lines[0] === 'KJKv4') {
+    const count = parseInt(lines[1], 10);
+    if (isNaN(count) || count < 1) throw new Error('Invalid count');
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      const line = lines[i + 2];
+      if (!line) continue;
+      const parts = line.split('|');
+      if (parts.length < 4) continue;
+      const enc_name = parts[0] || '';
+      const compB64 = parts.slice(3).join('|');
+      const ciphertext = await decompressCiphertext(compB64);
+      const needsPwd = await guessPasswordNeeded(enc_name);
+      let origName = '(encrypted)', decExt = '', data = new Uint8Array();
+      if (needsPwd && !password) {
+        origName = '(password needed)';
+      } else {
+        try {
+          data = await decryptRaw(ciphertext, password, null, true);
+          if (enc_name) {
+            try {
+              const [dn, de] = await decryptFilename(enc_name, password, null);
+              if (filenameLooksValid(dn)) { origName = de ? `${dn}.${de}` : dn; }
+              else { needsPwd = true; origName = '(password needed)'; }
+            } catch { needsPwd = true; origName = '(password needed)'; }
+          }
+        } catch { needsPwd = true; origName = '(password needed)'; }
+      }
+      results.push({ ext: decExt, originalName: origName, bytes: data,
+        blob: new Blob([data], { type: getMimeType(decExt) }),
+        _needsPassword: needsPwd, _ciphertext: ciphertext });
+    }
+    return results;
+  }
+
+  if (lines[0] === 'KJKv3') {
+    const count = parseInt(lines[1], 10);
+    if (isNaN(count) || count < 1) throw new Error('Invalid count');
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      const line = lines[i + 2];
+      if (!line) continue;
+      const parts = line.split('|');
+      if (parts.length < 4) continue;
+      const enc_name = parts[0] || '';
+      const ciphertext = parts.slice(3).join('|');
+      const needsPwd = await guessPasswordNeeded(enc_name);
+      let origName = '(encrypted)', decExt = '', data = new Uint8Array();
+      if (needsPwd && !password) {
+        origName = '(password needed)';
+      } else {
+        try {
+          data = await decryptRaw(ciphertext, password, null, true);
+          if (enc_name) {
+            try {
+              const [dn, de] = await decryptFilename(enc_name, password, null);
+              if (filenameLooksValid(dn)) { origName = de ? `${dn}.${de}` : dn; }
+              else { needsPwd = true; origName = '(password needed)'; }
+            } catch { needsPwd = true; origName = '(password needed)'; }
+          }
+        } catch { needsPwd = true; origName = '(password needed)'; }
+      }
+      results.push({ ext: decExt, originalName: origName, bytes: data,
+        blob: new Blob([data], { type: getMimeType(decExt) }),
+        _needsPassword: needsPwd, _ciphertext: ciphertext });
+    }
+    return results;
+  }
+
+  if (lines[0] === 'KJKv2') {
+    const count = parseInt(lines[1], 10);
+    if (isNaN(count) || count < 1) throw new Error('Invalid count');
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      const line = lines[i + 2];
+      if (!line) continue;
+      const parts = line.split('|');
+      let _mode, name, ext, ciphertext;
+      if (parts.length >= 5) {
+        [_mode, name, ext] = parts;
+        ciphertext = parts.slice(4).join('|');
+      } else {
+        [_mode, name, ext] = parts;
+        ciphertext = parts.slice(3).join('|');
+      }
+      const data = await decryptRaw(ciphertext, password, null, true);
+      results.push({ name, ext, originalName: ext ? `${name}.${ext}` : name,
+        bytes: data, blob: new Blob([data], { type: getMimeType(ext) }),
+        _needsPassword: false, _ciphertext: ciphertext });
+    }
+    return results;
+  }
+
+  if (isRawCiphertext(parseContent)) {
+    if (v6PrefixInfo) {
+      const results = [{
+        ext: '', originalName: '(password header)', bytes: new Uint8Array(),
+        blob: new Blob([]), _needsPassword: false, _ciphertext: '',
+        enc_name: '', _isPasswordHeader: true, _isPasswordPrefixHeader: true,
+        _saltHex: v6PrefixInfo.saltHex, _hashHex: v6PrefixInfo.hashHex,
+      }];
+      if (password && password.trim()) {
+        const valid = await verifyPassword(password, v6PrefixInfo.saltHex, v6PrefixInfo.hashHex);
+        if (!valid) {
+          results.push({ ext: '', originalName: '(wrong password)', bytes: new Uint8Array(),
+            blob: new Blob([]), _needsPassword: true, _ciphertext: parseContent });
+        } else {
+          const salt = saltFromHex(v6PrefixInfo.saltHex);
+          const data = await decryptRaw(parseContent, password, salt, false);
+          results.push({ name: 'decrypted', ext: '', originalName: 'decrypted_text',
+            bytes: data, blob: new Blob([data]), _needsPassword: false, _ciphertext: parseContent, _kjkv7: true });
+        }
+      } else {
+        results.push({ ext: '', originalName: '(password needed)', bytes: new Uint8Array(),
+          blob: new Blob([]), _needsPassword: true, _ciphertext: parseContent });
+      }
+      return results;
+    }
+    // BUG FIX: use parseContent instead of undefined content
+    const data = await decryptRaw(parseContent, password, null, false);
+    return [{ name: 'decrypted', ext: '', originalName: 'decrypted_text',
+      bytes: data, blob: new Blob([data]), _needsPassword: false, _ciphertext: parseContent }];
+  }
+
+  throw new Error('Invalid input: not a valid .kjk file or ciphertext');
+}
+
+// ======================== Tree View ========================
+function renderDecryptResults() {
+  const container = document.getElementById('decryptedItems');
+  const toolbar = document.getElementById('decryptToolbar');
+  const statusBar = document.getElementById('decryptStatusBar');
+  const preview = document.getElementById('decryptPreview');
+
+  if (decryptResults.length === 0) {
+    container.innerHTML = `<div class="tree-empty" data-i18n="treeNoSelection">${t('treeNoSelection')}</div>`;
+    preview.innerHTML = '';
+    toolbar.style.display = 'none';
+    statusBar.style.display = 'none';
+    return;
+  }
+
+  toolbar.style.display = 'flex';
+  statusBar.style.display = 'flex';
+
+  const root = buildTree(decryptResults);
+  container.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+  if (decryptResults.some(r => r._kjkv7 !== undefined)) {
+    const banner = document.createElement('div');
+    banner.className = 'legacy-notice';
+    banner.textContent = t('legacyNotice');
+    fragment.appendChild(banner);
+  }
+  renderTreeNode(root, fragment, 0);
+  container.appendChild(fragment);
+
+  updateTreeStatusBar();
+
+  if (previewEnabled && selectedPreviewIdx >= 0 && selectedPreviewIdx < decryptResults.length) {
+    renderPreview(selectedPreviewIdx);
+  }
+}
+
+function buildTree(items) {
+  const root = { name: '', children: {}, itemIdx: -1, isDir: true };
+  items.forEach((item, idx) => {
+    const raw = item.originalName || '';
+    const isDir = raw.endsWith('/');
+    const parts = (isDir ? raw.slice(0, -1) : raw).split('/').filter(Boolean);
+    let node = root;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLast = i === parts.length - 1;
+      if (isLast) {
+        node.children[part] = { name: part, itemIdx: idx, children: {}, isDir };
+      } else {
+        if (!node.children[part]) {
+          node.children[part] = { name: part, itemIdx: -1, children: {}, isDir: true };
+        }
+        node = node.children[part];
+      }
+    }
+  });
+  return root;
+}
+
+function renderTreeNode(node, container, level) {
+  const names = Object.keys(node.children).sort((a, b) => {
+    const ca = node.children[a].isDir ? 0 : 1;
+    const cb = node.children[b].isDir ? 0 : 1;
+    if (ca !== cb) return ca - cb;
+    return a.localeCompare(b);
+  });
+
+  const fragment = document.createDocumentFragment();
+  for (const name of names) {
+    const child = node.children[name];
+    const isDir = child.isDir;
+    const hasChildren = isDir && Object.keys(child.children).length > 0;
+    const item = child.itemIdx >= 0 ? decryptResults[child.itemIdx] : null;
+    const icon = isDir ? '📁' : getFileEmojiIcon(item?.ext || '');
+
+    const row = document.createElement('div');
+    row.className = 'tree-node';
+    if (child.itemIdx === selectedPreviewIdx) row.classList.add('selected');
+    row.innerHTML = `
+      <span class="tree-toggle ${hasChildren ? '' : 'collapsed leaf'}">▾</span>
+      <span class="tree-icon">${icon}</span>
+      <span class="tree-name">${escapeHtml(name)}</span>
+      ${item ? `<span class="tree-size">${formatSize(item.bytes.length)}</span>` : ''}
+      ${item && item._needsPassword ? `<span class="tree-status" style="color:var(--warning)">🔒</span>` : ''}
+    `;
+    row._node = child;
+    fragment.appendChild(row);
+
+    if (isDir) {
+      const childWrapper = document.createElement('div');
+      childWrapper.className = 'tree-children expanded';
+      const childInner = document.createElement('div');
+      childInner.className = 'tree-children-inner';
+      renderTreeNode(child, childInner, level + 1);
+      childWrapper.appendChild(childInner);
+      fragment.appendChild(childWrapper);
+    }
+  }
+  container.appendChild(fragment);
+}
+
+function toggleTreeNode(toggle, node, rowElement) {
+  const wrapper = rowElement.nextElementSibling;
+  if (!wrapper || !wrapper.classList.contains('tree-children')) return;
+  const isCollapsed = wrapper.classList.contains('collapsed');
+  wrapper.classList.toggle('collapsed', !isCollapsed);
+  toggle.classList.toggle('collapsed', !isCollapsed);
+}
+
+function selectTreeNode(node, rowElement) {
+  document.querySelectorAll('#decryptedItems .tree-node').forEach(n => n.classList.remove('selected'));
+  rowElement.classList.add('selected');
+  selectedTreeNode = node;
+  if (node.itemIdx >= 0) {
+    selectedPreviewIdx = node.itemIdx;
+    renderPreview(node.itemIdx);
+  }
+}
+
+// 事件委托：减少大量节点时的事件监听器数量
+(function initTreeEvents() {
+  const container = document.getElementById('decryptedItems');
+  if (!container) return;
+  container.addEventListener('click', (e) => {
+    const row = e.target.closest('.tree-node');
+    if (!row) return;
+    const node = row._node;
+    if (!node) return;
+    const toggle = e.target.closest('.tree-toggle');
+    if (toggle) {
+      e.stopPropagation();
+      toggleTreeNode(toggle, node, row);
+    } else {
+      selectTreeNode(node, row);
+    }
+  });
+})();
+
+const FILE_EMOJI_MAP = {
+  txt: '📄', log: '📄', md: '📄', csv: '📄', json: '📄', xml: '📄', html: '📄', css: '📄',
+  js: '📄', jsx: '📄', ts: '📄', tsx: '📄', py: '📄', java: '📄', c: '📄', cpp: '📄', h: '📄',
+  cs: '📄', go: '📄', rs: '📄', php: '📄', rb: '📄', swift: '📄', kt: '📄',
+  yaml: '📄', yml: '📄', ini: '📄', cfg: '📄', toml: '📄',
+  png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️', bmp: '🖼️', ico: '🖼️', svg: '🖼️',
+  mp4: '🎬', webm: '🎬', avi: '🎬', mov: '🎬', mkv: '🎬', flv: '🎬',
+  mp3: '🎵', wav: '🎵', ogg: '🎵', flac: '🎵', aac: '🎵', m4a: '🎵', wma: '🎵',
+  zip: '📦', rar: '📦', '7z': '📦', tar: '📦', gz: '📦', bz2: '📦', xz: '📦', kjk: '📦',
+  pdf: '📋', doc: '📘', docx: '📘', xls: '📗', xlsx: '📗', ppt: '📙', pptx: '📙',
+  db: '🗄️', sqlite: '🗄️', sql: '🗄️',
+  ttf: '🔤', otf: '🔤', woff: '🔤', woff2: '🔤'
+};
+
+function getFileEmojiIcon(ext) {
+  if (!ext) return '📎';
+  return FILE_EMOJI_MAP[ext.toLowerCase()] || '📎';
+}
+
+function updateTreeStatusBar() {
+  const fileItems = decryptResults.filter(r => !r.originalName.endsWith('/'));
+  const totalFiles = fileItems.length;
+  const totalSize = fileItems.reduce((sum, r) => sum + (r.bytes?.length || 0), 0);
+  document.getElementById('statusTotalFiles').textContent = `${totalFiles} ${t('statusTotalFiles')}`;
+  document.getElementById('statusTotalSize').textContent = `${formatSize(totalSize)} ${t('statusTotalSize')}`;
+  document.getElementById('statusProtected').style.display = packageHasPassword ? 'inline' : 'none';
+}
+
+// ======================== Preview ========================
+async function renderPreview(idx) {
+  const item = decryptResults[idx];
+  const container = document.getElementById('decryptPreview');
+  if (!container || !previewEnabled || !item) return;
+  if (item._kjk9) {
+    try {
+      await ensureKjk9Item(item);
+    } catch {
+      container.innerHTML = '';
+      showToast(t('wrongPassword'));
+      return;
+    }
+  }
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap">
+      <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.originalName)}</div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${item._needsPassword ? `<button class="btn btn-sm" onclick="reDecryptItem(${idx})" style="background:var(--warning);color:#fff;border-color:var(--warning)">🔑 ${t('retryPassword')}</button>` : ''}
+        <button class="btn btn-sm btn-primary" onclick="downloadDecrypted(${idx})">${t('download')}</button>
+      </div>
+    </div>
+  `;
+  const previewBox = document.createElement('div');
+  container.appendChild(previewBox);
+
+  const ext = item.ext || '';
+  const type = getFileType(ext);
+
+  const isTextLike = type === 'text' ||
+    (type === 'binary' && item.bytes.length > 0 && isMostlyPrintable(item.bytes));
+
+  if (isTextLike) {
+    item.blob.text().then(text => {
+      const truncated = text.length > 8000 ? text.substring(0, 8000) + '\n... (' + formatSize(text.length) + ' total)' : text;
+      previewBox.innerHTML = `
+        <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--bg);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-tertiary)">
+            <span>Content Preview</span>
+            <span>${formatSize(text.length)}</span>
+          </div>
+          <pre style="margin:0;padding:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-all;max-height:360px;overflow-y:auto;color:var(--text);tab-size:2">${escapeHtml(truncated)}</pre>
+        </div>`;
+    });
+    return;
+  }
+
+  const url = URL.createObjectURL(item.blob);
+  switch (type) {
+    case 'image':
+      previewBox.innerHTML = `<div style="text-align:center;background:var(--bg-secondary);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border)"><img src="${url}" alt="${escapeHtml(item.originalName)}" loading="lazy" style="max-width:100%;max-height:350px;border-radius:4px"></div>`;
+      break;
+    case 'audio':
+      previewBox.innerHTML = `<div style="padding:8px 0"><audio controls src="${url}" style="width:100%;height:40px">Your browser does not support audio.</audio></div>`;
+      break;
+    case 'video':
+      previewBox.innerHTML = `<video controls src="${url}" style="width:100%;max-height:380px;border-radius:var(--radius-sm)">Your browser does not support video.</video>`;
+      break;
+    case 'svg':
+      item.blob.text().then(text => {
+        previewBox.innerHTML = `<div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:16px;text-align:center;border:1px solid var(--border)">${text}</div>`;
+      });
+      break;
+    default:
+      previewBox.innerHTML = `<div style="font-size:13px;color:var(--text-tertiary);padding:12px;text-align:center;background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px solid var(--border)">${escapeHtml(item.originalName)} (${formatSize(item.bytes.length)})</div>`;
+  }
+}
+
+function downloadDecrypted(idx) {
+  const item = decryptResults[idx];
+  if (item.originalName && item.originalName.endsWith('/')) {
+    showToast(t('cannotDownloadFolder'));
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(item.blob);
+  a.download = item.originalName.split('/').pop();
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(t('downloadSuccess'));
+}
+
+async function downloadAllDecryptedAsZip() {
+  if (decryptResults.length === 0) return;
+  const hasFolder = decryptResults.some(i => (i.originalName || '').includes('/'));
+  const useZip = decryptResults.length > 1 || hasFolder;
+  if (!useZip) {
+    downloadDecrypted(0);
+    return;
+  }
+  if (typeof JSZip === 'undefined') {
+    showToast(t('zipLibraryMissing'));
+    return;
+  }
+  const zip = new JSZip();
+  for (const item of decryptResults) {
+    const name = item.originalName || 'unknown';
+    if (name.endsWith('/')) {
+      zip.folder(name.slice(0, -1));
+    } else {
+      zip.file(name, item.blob);
+    }
+  }
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'decrypted.zip';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(t('downloadSuccess'));
+}
+
+function clearDecrypt() {
+  document.getElementById('decryptText').value = '';
+  decryptFiles = [];
+  decryptResults = [];
+  selectedPreviewIdx = -1;
+  selectedTreeNode = null;
+  packageHasPassword = false;
+  document.getElementById('decryptFileList').innerHTML = '';
+  document.getElementById('decryptedItems').innerHTML = '';
+  document.getElementById('decryptPreview').innerHTML = '';
+  document.getElementById('decryptResult').classList.remove('visible');
+  document.getElementById('decryptActions').style.display = 'none';
+  document.getElementById('decryptToolbar').style.display = 'none';
+  document.getElementById('decryptStatusBar').style.display = 'none';
+}
+
+// ======================== New Package Manager Functions (stubs) ========================
+function extractSelectedEntry() {
+  if (!selectedTreeNode || selectedTreeNode.itemIdx < 0) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  downloadDecrypted(selectedTreeNode.itemIdx);
+}
+
+function deleteSelectedEntry() {
+  const session = kjk9ActiveSession();
+  if (!session || !selectedTreeNode || selectedTreeNode.itemIdx < 0) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  const item = decryptResults[selectedTreeNode.itemIdx];
+  const p = item.originalName || '';
+  const isDirEntry = p.endsWith('/');
+  const prefix = isDirEntry ? p.slice(0, -1) : p;
+  const doomed = session.dir.files.filter(f => f.p === p || (isDirEntry && f.p.startsWith(prefix + '/')));
+  if (doomed.length === 0) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  if (!confirm(`${t('confirmDelete')} ${p}`)) return;
+  session.dir.free = session.dir.free || [];
+  for (const r of doomed) for (const [o, c] of r.b) session.dir.free.push([o, c]);
+  session.dir.files = session.dir.files.filter(f => f.p !== p && !(isDirEntry && f.p.startsWith(prefix + '/')));
+  kjk9Rebuild(session, session.dir).then(blob => applyKjk9Edit(blob, 'edited.kjk'));
+}
+
+function renameSelectedEntry() {
+  const session = kjk9ActiveSession();
+  if (!session || !selectedTreeNode || selectedTreeNode.itemIdx < 0) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  const item = decryptResults[selectedTreeNode.itemIdx];
+  const p = item.originalName || '';
+  if (p.endsWith('/')) {
+    showToast(t('cannotModifyFolder'));
+    return;
+  }
+  const slash = p.lastIndexOf('/');
+  const base = slash >= 0 ? p.slice(0, slash + 1) : '';
+  const curName = p.slice(slash + 1);
+  const newName = prompt(t('renamePrompt'), curName);
+  if (!newName || !newName.trim()) return;
+  const trimmed = newName.trim();
+  if (trimmed === curName) return;
+  const newP = base + trimmed;
+  if (session.dir.files.some(f => f.p === newP)) {
+    showToast(t('passwordMismatch'));
+    return;
+  }
+  const entry = session.dir.files.find(f => f.p === p);
+  if (!entry) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  entry.p = newP;
+  kjk9Rebuild(session, session.dir).then(blob => applyKjk9Edit(blob, 'edited.kjk'));
+}
+
+function changePassword() {
+  const session = kjk9ActiveSession();
+  if (!session) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  const pwd1 = prompt(t('changePasswordPrompt'));
+  if (pwd1 === null) return;
+  const pwd2 = prompt(t('newPasswordConfirm'));
+  if (pwd1 !== pwd2) {
+    showToast(t('passwordMismatch'));
+    return;
+  }
+  kjk9ChangePassword(session, pwd1 || '').then(blob => {
+    session.pwd = pwd1 || '';
+    return applyKjk9Edit(blob, 'edited.kjk');
+  });
+}
+
+function verifyPackageIntegrity() {
+  alert(`${t('verifyIntegrity')}\n${t('integrityNoHash')}`);
+}
+
+function appendToPackage() {
+  const session = kjk9ActiveSession();
+  if (!session) {
+    showToast(t('treeNoSelection'));
+    return;
+  }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.onchange = async () => {
+    if (!input.files || input.files.length === 0) return;
+    const tasks = Array.from(input.files).map(f => ({ file: f, name: f.name, path: f.webkitRelativePath || f.name }));
+    const blob = await kjk9Append(session, tasks);
+    if (!blob) return;
+    await applyKjk9Edit(blob, 'edited.kjk');
+  };
+  input.click();
+}
+
+// ======================== Drag & Drop ========================
+document.addEventListener('DOMContentLoaded', () => {
+  ['encryptDropZone', 'decryptDropZone'].forEach(id => {
+    const zone = document.getElementById(id);
+    if (!zone) return;
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', async e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      if (id === 'encryptDropZone') {
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+          const all = [];
+          for (const it of e.dataTransfer.items) {
+            const entry = it.webkitGetAsEntry ? it.webkitGetAsEntry() : null;
+            if (entry) {
+              all.push(...await traverseEntry(entry));
+            } else if (it.kind === 'file') {
+              const f = it.getAsFile();
+              if (f) all.push({ file: f, path: f.name });
+            }
+          }
+          encryptFiles = all;
+          renderEncryptFileList();
+          if (all.length > 0) showToast(`${all.length} ${t('filesSelected')}`);
+        } else {
+          handleEncryptFiles(e.dataTransfer.files);
+        }
+      } else {
+        handleDecryptFiles(e.dataTransfer.files);
+      }
+    });
+  });
+});
+
+// ======================== Utilities ========================
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function getMimeType(ext) {
+  const mime = {
+    'txt': 'text/plain', 'html': 'text/html', 'css': 'text/css', 'js': 'text/javascript',
+    'json': 'application/json', 'xml': 'application/xml', 'md': 'text/markdown',
+    'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'gif': 'image/gif',
+    'webp': 'image/webp', 'bmp': 'image/bmp', 'svg': 'image/svg+xml',
+    'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'ogg': 'audio/ogg', 'flac': 'audio/flac',
+    'mp4': 'video/mp4', 'webm': 'video/webm', 'avi': 'video/x-msvideo',
+    'pdf': 'application/pdf', 'zip': 'application/zip',
+  };
+  return mime[ext?.toLowerCase()] || 'application/octet-stream';
+}
+
+function getFileType(ext) {
+  const imageExts = ['png','jpg','jpeg','gif','webp','bmp','ico'];
+  const audioExts = ['mp3','wav','ogg','flac','aac','m4a'];
+  const videoExts = ['mp4','webm','avi','mov','mkv'];
+  const textExts = ['txt','html','css','js','json','xml','md','csv','ini','cfg','yaml','yml','toml','log'];
+  const e = ext?.toLowerCase();
+  if (e === 'svg') return 'svg';
+  if (imageExts.includes(e)) return 'image';
+  if (audioExts.includes(e)) return 'audio';
+  if (videoExts.includes(e)) return 'video';
+  if (textExts.includes(e)) return 'text';
+  return 'binary';
+}
+
+function isMostlyPrintable(bytes) {
+  try {
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const text = decoder.decode(bytes.slice(0, Math.min(bytes.length, 4096)));
+    let printable = 0;
+    for (let i = 0; i < text.length; i++) {
+      const c = text.charCodeAt(i);
+      if (c >= 32 && c <= 126 || c > 127) printable++;
+    }
+    return printable / text.length > 0.7;
+  } catch { return false; }
+}
+
+// ======================== Update Check & Download ========================
+let checkUpdateEnabled = true;
+let customUpdateServer = '';
+
+function loadUpdateSettings() {
+  const saved = localStorage.getItem('kjk_check_update');
+  if (saved === 'false') {
+    checkUpdateEnabled = false;
+    document.getElementById('checkUpdateToggle').classList.remove('active');
+    document.getElementById('checkUpdateToggle').setAttribute('aria-checked', 'false');
+  }
+  customUpdateServer = localStorage.getItem('kjk_update_server') || '';
+  const input = document.getElementById('updateServerInput');
+  if (input) input.value = customUpdateServer;
+}
+
+function toggleCheckUpdate() {
+  checkUpdateEnabled = !checkUpdateEnabled;
+  const toggle = document.getElementById('checkUpdateToggle');
+  toggle.classList.toggle('active', checkUpdateEnabled);
+  toggle.setAttribute('aria-checked', checkUpdateEnabled ? 'true' : 'false');
+  localStorage.setItem('kjk_check_update', checkUpdateEnabled ? 'true' : 'false');
+  showToast(checkUpdateEnabled ? t('checkUpdateOnStart') + ': ON' : t('checkUpdateOnStart') + ': OFF');
+}
+
+function saveUpdateServer() {
+  const input = document.getElementById('updateServerInput');
+  if (!input) return;
+  customUpdateServer = input.value.trim();
+  localStorage.setItem('kjk_update_server', customUpdateServer);
+}
+
+function openApiDocs() {
+  window.open('https://dnteam.top/KJK/api/apidoc.html', '_blank');
+}
+
+// ======================== Format Compatibility ========================
+function setFormatCompat(value) {
+  formatCompat = value;
+  localStorage.setItem('kjk_format_compat', value);
+  const label = value === 'KJKv9' ? t('formatV9') : value === 'KJKv7' ? t('formatV7') : value === 'KJKv5' ? t('formatV5') : t('formatAuto');
+  showToast(t('formatCompat') + ': ' + label);
+}
+
+function loadFormatSettings() {
+  const saved = localStorage.getItem('kjk_format_compat') || 'auto';
+  formatCompat = saved;
+  const select = document.getElementById('formatCompatSelect');
+  if (select) {
+    select.value = saved;
+  }
+}
+
+async function kjkVersionRequest() {
+  const payload = JSON.stringify({
+    header: 'kjk_version',
+    version: CURRENT_VERSION
+  });
+  const servers = [];
+  if (customUpdateServer && customUpdateServer.trim()) {
+    servers.push(customUpdateServer.trim());
+  }
+  servers.push(SERVER_URL_PRIMARY, SERVER_URL_BACKUP);
+  for (const url of servers) {
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'KJK-Encryptor/' + CURRENT_VERSION
+        },
+        body: payload,
+        signal: AbortSignal.timeout(10000)
+      });
+      if (resp.ok) {
+        const result = await resp.json();
+        if (result.status === 'success') return result.data;
+      }
+    } catch(e) { /* try next */ }
+  }
+  return null;
+}
+
+async function silentCheckForUpdate() {
+  if (!checkUpdateEnabled) return;
+  const data = await kjkVersionRequest();
+  if (!data) return;
+  if (data.has_update) showUpdateDialog(data);
+}
+
+async function checkForUpdate() {
+  const btn = document.getElementById('checkUpdateBtn');
+  btn.disabled = true;
+  btn.innerHTML = `⏳ <span data-i18n="checkingUpdate">${t('checkingUpdate')}</span>`;
+
+  const data = await kjkVersionRequest();
+
+  btn.disabled = false;
+  btn.innerHTML = `🔄 <span data-i18n="checkUpdate">${t('checkUpdate')}</span>`;
+
+  if (!data) {
+    showToast(t('updateError'));
+    return;
+  }
+
+  if (data.has_update) showUpdateDialog(data);
+  else showToast(t('latestVersion'));
+}
+
+function showUpdateDialog(data) {
+  lastUpdateData = data;
+  document.getElementById('updateNewVersion').textContent = (data.latest_version || '');
+  document.getElementById('updateCurrentVersion').textContent = CURRENT_VERSION;
+  const uc = data.update_content || {};
+  document.getElementById('updateChangelog').textContent = uc[currentLang] || uc['zh-CN'] || uc['en'] || '';
+  document.getElementById('updateOverlay').classList.add('open');
+}
+
+function closeUpdateDialog(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('updateOverlay').classList.remove('open');
+}
+
+function showDownloadSourceDialog() {
+  closeUpdateDialog();
+  const overlay = document.getElementById('downloadOverlay');
+  const titleEl = document.getElementById('downloadTitle');
+  const fillEl = document.getElementById('downloadProgressFill');
+  const textEl = document.getElementById('downloadProgressText');
+  const detailEl = document.getElementById('downloadProgressDetail');
+
+  fillEl.style.width = '0%';
+  textEl.textContent = t('chooseDownload');
+  detailEl.innerHTML = `
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button onclick="startUpdateDownload('${DOWNLOAD_URL_PRIMARY}')" class="btn btn-primary" style="flex:1;padding:10px">${t('downloadServerPrimary')}</button>
+      <button onclick="startUpdateDownload('${DOWNLOAD_URL_BACKUP}')" class="btn" style="flex:1;padding:10px">${t('downloadServerBackup')}</button>
+    </div>
+  `;
+  titleEl.textContent = t('chooseDownload');
+  overlay.classList.add('open');
+}
+
+function startUpdateDownload(url) {
+  const overlay = document.getElementById('downloadOverlay');
+  const titleEl = document.getElementById('downloadTitle');
+  const fillEl = document.getElementById('downloadProgressFill');
+  const textEl = document.getElementById('downloadProgressText');
+  const detailEl = document.getElementById('downloadProgressDetail');
+
+  titleEl.textContent = t('downloading') + '...';
+  fillEl.style.width = '0%';
+  textEl.textContent = '0%';
+  detailEl.textContent = '';
+
+  downloadWithProgress(url)
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'KJKinstaller.exe';
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+
+      titleEl.textContent = '✅ ' + t('downloadComplete');
+      fillEl.style.width = '100%';
+      textEl.textContent = '100%';
+      detailEl.textContent = '';
+
+      setTimeout(() => overlay.classList.remove('open'), 2500);
+      showToast(t('downloadComplete'));
+    })
+    .catch(err => {
+      titleEl.textContent = '❌ ' + t('updateError');
+      textEl.textContent = err.message;
+      detailEl.innerHTML = `<button onclick="startUpdateDownload('${url}')" class="btn btn-primary" style="margin-top:8px;padding:8px 16px">${t('checkUpdate')}</button>`;
+      setTimeout(() => overlay.classList.remove('open'), 3000);
+      showToast(t('updateError') + ': ' + err.message);
+    });
+}
+
+function downloadWithProgress(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'blob';
+
+    xhr.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 100);
+        const fillEl = document.getElementById('downloadProgressFill');
+        const textEl = document.getElementById('downloadProgressText');
+        const detailEl = document.getElementById('downloadProgressDetail');
+
+        fillEl.style.width = pct + '%';
+        textEl.textContent = pct + '%';
+        detailEl.textContent = formatSize(e.loaded) + ' / ' + formatSize(e.total);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject(new Error('HTTP ' + xhr.status));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onabort = () => reject(new Error('Download aborted'));
+    xhr.send();
+  });
+}
+
+// ======================== Init ========================
+(function init() {
+  const savedLang = localStorage.getItem('kjk_lang');
+  const savedTheme = localStorage.getItem('kjk_theme');
+  const savedPreview = localStorage.getItem('kjk_preview');
+  const savedCleanUI = localStorage.getItem('kjk_cleanUI');
+
+  if (savedLang) switchLang(savedLang);
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    currentTheme = savedTheme;
+    document.getElementById('darkModeToggle').classList.toggle('active', savedTheme === 'dark');
+    updateThemeIcon();
+  }
+  if (savedPreview === 'false') {
+    previewEnabled = false;
+    document.getElementById('previewToggle').classList.remove('active');
+  }
+  if (savedCleanUI === 'true') {
+    cleanUIMode = true;
+    document.getElementById('cleanUIToggle').classList.add('active');
+    document.body.style.setProperty('--radius', '4px');
+    document.body.style.setProperty('--radius-sm', '2px');
+  }
+
+  loadUpdateSettings();
+  loadFormatSettings();
+  const serverInput = document.getElementById('updateServerInput');
+  if (serverInput) {
+    serverInput.addEventListener('change', saveUpdateServer);
+    serverInput.addEventListener('blur', saveUpdateServer);
+  }
+
+  applyI18n();
+
+  document.getElementById('settingsVersion').textContent = CURRENT_VERSION;
+
+  setTimeout(() => silentCheckForUpdate(), 2000);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('settingsOverlay').classList.remove('open');
+      document.getElementById('updateOverlay').classList.remove('open');
+      document.getElementById('downloadOverlay').classList.remove('open');
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      if (currentTab === 'encrypt') doEncrypt();
+      else doDecrypt();
+    }
+  });
+})();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJK Encryptor - API Documentation</title>
+<link rel="icon" href="/website/favicon.png" type="image/png">
+<link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+<style>
+:root {
+  --bg: #fafbfc;
+  --bg-card: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --border: #d2d2d7;
+  --border-light: #e5e5ea;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-secondary: #5856d6;
+  --danger: #ff3b30;
+  --success: #34c759;
+  --warning: #ff9500;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.1);
+}
+[data-theme="dark"] {
+  --bg: #0a0a0c;
+  --bg-card: #1c1c1e;
+  --bg-secondary: #2c2c30;
+  --text: #f5f5f7;
+  --text-secondary: #98989d;
+  --text-tertiary: #6e6e73;
+  --border: #38383a;
+  --border-light: #3a3a3e;
+  --accent: #2997ff;
+  --accent-hover: #40a9ff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.3);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.3s, color 0.2s;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  position: relative;
+}
+
+/* ===== 现代化背景:Apple 风格渐变+虚化图片 ===== */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 500px;
+  background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80');
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 500px;
+  background: linear-gradient(180deg, rgba(250, 251, 252, 0.4) 0%, rgba(250, 251, 252, 0.95) 80%, var(--bg) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="dark"]::before {
+  opacity: 0.08;
+}
+[data-theme="dark"]::after {
+  background: linear-gradient(180deg, rgba(10, 10, 12, 0.3) 0%, rgba(10, 10, 12, 0.95) 80%, var(--bg) 100%);
+}
+
+body:not(.classic-mode) #dnt-main {
+  position: relative;
+  z-index: 2;
+}
+
+/* 主内容区:为 sidebar.js 侧边栏留出空间 */
+#dnt-main {
+  min-height: 100vh;
+}
+
+/* ===== Top Bar - 毛玻璃效果 ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+[data-theme="dark"] .topbar {
+  background: rgba(28, 28, 30, 0.85);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.topbar-title {
+  font-size: 17px; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+  letter-spacing: -0.01em;
+}
+.topbar-title-icon {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 18px;
+}
+.topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text); font-size: 13px; font-family: var(--font-sans);
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-weight: 500;
+}
+.btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-tertiary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* Language Switcher */
+.lang-switcher {
+  display: flex; gap: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 4px; border-radius: 10px;
+  border: 1px solid var(--border-light);
+}
+.lang-btn {
+  padding: 6px 14px; border: none; background: transparent;
+  font-size: 12px; font-weight: 500; font-family: var(--font-sans);
+  color: var(--text-secondary); cursor: pointer;
+  border-radius: 7px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lang-btn.active {
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+.lang-btn:hover:not(.active) { color: var(--text); }
+
+/* Version Selector */
+.ver-switcher select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 7px 30px 7px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.ver-switcher select:hover { border-color: var(--text-tertiary); }
+.ver-switcher select:focus { outline: none; border-color: var(--accent); }
+.ver-switcher select option { background: var(--bg-card); color: var(--text); }
+/* 按版本过滤:隐藏后引入的章节 */
+.sec-hidden { display: none !important; }
+/* 章节顶部的版本徽标 */
+.ver-badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  color: var(--accent);
+  background: rgba(0, 113, 227, 0.12);
+}
+[data-theme="dark"] .ver-badge { background: rgba(41, 151, 255, 0.18); }
+/* 版本切换提示条 */
+.ver-notice {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 149, 0, 0.12);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.ver-notice.show { display: flex; }
+.ver-notice i { color: var(--warning); }
+
+/* Container */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Typography - Apple 风格 ===== */
+h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #1d1d1f 0%, #424245 50%, #6e6e73 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-theme="dark"] h1 {
+  background: linear-gradient(135deg, #f5f5f7 0%, #a1a1a6 50%, #6e6e73 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+h2 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-top: 48px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-light);
+  letter-spacing: -0.02em;
+  position: relative;
+}
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-secondary));
+  border-radius: 2px;
+  margin-left: -16px;
+}
+h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  letter-spacing: -0.015em;
+}
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+p {
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.intro {
+  font-size: 17px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.7;
+  max-width: 680px;
+}
+
+/* ===== Cards - 毛玻璃卡片 ===== */
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 32px;
+  margin-bottom: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="dark"] .card {
+  background: rgba(28, 28, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Endpoint Display */
+.endpoint {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  border: 1px solid var(--border-light);
+  flex-wrap: wrap;
+  transition: all 0.2s ease;
+}
+.endpoint:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+.method {
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  color: #fff;
+  min-width: 60px;
+  text-align: center;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+.method.get { background: var(--success); }
+.method.post { background: var(--accent); }
+.method.delete { background: var(--danger); }
+.endpoint-url {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  word-break: break-all;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Code Blocks */
+pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: var(--radius-sm);
+  padding: 20px 22px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+pre code { background: none; padding: 0; color: inherit; }
+code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--bg-secondary);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  border: 1px solid var(--border-light);
+}
+.code-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.code-label.linux {
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--accent);
+}
+.code-label.windows {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--success);
+}
+.code-label.json {
+  background: rgba(255, 149, 0, 0.15);
+  color: var(--warning);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+th, td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  font-size: 13px;
+}
+td code { font-size: 12px; }
+tr:hover { background: var(--bg-secondary); }
+tr:last-child td { border-bottom: none; }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+}
+.badge.required { background: rgba(255, 59, 48, 0.12); color: var(--danger); }
+.badge.optional { background: rgba(170, 170, 178, 0.18); color: var(--text-secondary); }
+.badge.new { background: rgba(52, 199, 89, 0.15); color: var(--success); }
+
+/* Hidden content for language switching */
+[data-lang] { display: none; }
+[data-lang].active { display: block; }
+
+/* Sidebar Nav - 毛玻璃导航 */
+.nav {
+  position: sticky;
+  top: 90px;
+  float: right;
+  width: 200px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+[data-theme="dark"] .nav {
+  background: rgba(28, 28, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.nav-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.nav a {
+  display: block;
+  padding: 6px 10px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  font-weight: 500;
+}
+.nav a:hover {
+  color: var(--accent);
+  background: rgba(0, 113, 227, 0.06);
+  transform: translateX(4px);
+}
+
+/* Notice Box */
+.notice {
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  font-size: 13px;
+  border-left: 4px solid;
+  transition: all 0.2s ease;
+}
+.notice:hover {
+  transform: translateX(4px);
+}
+.notice.info {
+  background: rgba(0, 113, 227, 0.08);
+  border-color: var(--accent);
+  color: var(--text);
+}
+.notice.warning {
+  background: rgba(255, 149, 0, 0.1);
+  border-color: var(--warning);
+  color: var(--text);
+}
+.notice.danger {
+  background: rgba(255, 59, 48, 0.08);
+  border-color: var(--danger);
+  color: var(--text);
+}
+
+/* ===== FadeInUp Animation ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+.delay-6 { animation-delay: 0.6s; }
+
+/* ===== Classic Mode ===== */
+body.classic-mode {
+  background: var(--bg) !important;
+}
+body.classic-mode::before,
+body.classic-mode::after {
+  display: none;
+}
+body.classic-mode .card,
+body.classic-mode .nav {
+  background: var(--bg-card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+body.classic-mode .topbar {
+  background: var(--bg-card);
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .nav { display: none; }
+  .container { padding: 28px 20px 60px; }
+  body::before,
+  body::after { height: 400px; }
+}
+
+/* ===== 移动端:sidebar 改为抽屉式 ===== */
+@media (max-width: 768px) {
+  /* sidebar 固定抽屉,默认隐藏 */
+  #dnt-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: var(--dnt-sw, 240px) !important;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,.4);
+  }
+  #dnt-sidebar.collapsed {
+    width: var(--dnt-sw, 240px) !important;
+    transform: translateX(-100%);
+    border-right: 1px solid var(--dnt-border);
+  }
+  #dnt-sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+  #dnt-main,
+  #dnt-main.collapsed {
+    margin-left: 0 !important;
+  }
+  #dnt-expand-btn {
+    display: flex !important;
+    top: 12px;
+    left: 12px;
+  }
+  #dnt-mobile-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100vh;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  #dnt-mobile-overlay.show {
+    display: block;
+    opacity: 1;
+  }
+  body:not(.classic-mode) #dnt-mobile-overlay {
+    background: rgba(0,0,0,0.55);
+  }
+  .topbar {
+    padding: 12px 16px 12px 64px;
+  }
+  .topbar-title {
+    font-size: 15px;
+  }
+  .topbar-actions {
+    flex: 1;
+    justify-content: flex-end;
+  }
+  body::before,
+  body::after { height: 300px; }
+}
+
+@media (max-width: 600px) {
+  .topbar { padding: 10px 14px 10px 60px; }
+  .topbar-title { font-size: 14px; }
+  .lang-switcher { padding: 3px; }
+  .lang-btn { padding: 5px 10px; font-size: 11px; }
+  .ver-switcher select { padding: 6px 24px 6px 10px; font-size: 11px; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  h1 { font-size: 28px; }
+  h2 { font-size: 20px; }
+  .card { padding: 22px 18px; border-radius: var(--radius-sm); }
+  pre { font-size: 12px; padding: 16px; }
+  .container { padding: 24px 14px 60px; }
+  .endpoint { padding: 14px; gap: 10px; }
+  .method { min-width: 50px; font-size: 11px; padding: 4px 10px; }
+  .endpoint-url { font-size: 12px; }
+  table { font-size: 12px; }
+  th, td { padding: 10px 12px; }
+  body::before,
+  body::after { height: 250px; }
+}
+</style>
+</head>
+<body>
+
+<div id="dnt-main">
+
+<div class="topbar">
+  <div class="topbar-title">
+    <i class="fa-solid fa-shield-halved topbar-title-icon"></i>
+    <span>KJK Encryptor API</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="ver-switcher">
+      <select id="verSelect" onchange="switchVersion(this.value)" aria-label="API version">
+        <option value="1.0.4" selected></option>
+        <option value="1.0.3"></option>
+        <option value="1.0.1"></option>
+      </select>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="switchLang('en')">EN</button>
+      <button class="lang-btn" onclick="switchLang('zh-HK')">繁體</button>
+      <button class="lang-btn" onclick="switchLang('zh-CN')">简体</button>
+    </div>
+    <button class="btn btn-sm" onclick="toggleTheme()" id="themeBtn">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </div>
+</div>
+
+<div class="container">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <div class="nav animate-fade-in-up delay-3" id="navBox">
+      <div class="nav-title">Contents</div>
+      <a href="#intro" data-i18n="navIntro">Introduction</a>
+      <a href="#compat" data-i18n="navCompat">Version &amp; Compatibility</a>
+      <a href="#quickstart" data-i18n="navQuick">Quick Start</a>
+      <a href="#status" data-i18n="navStatus">Status Check</a>
+      <a href="#encrypt" data-i18n="navEncrypt">Encrypt</a>
+      <a href="#decrypt" data-i18n="navDecrypt">Decrypt</a>
+      <a href="#settings" data-i18n="navSettings">Settings</a>
+      <a href="#detect" data-i18n="navDetect">Detect Format</a>
+      <a href="#package" data-i18n="navPackage">Package Management</a>
+      <a href="#shutdown" data-i18n="navShutdown">Shutdown</a>
+      <a href="#headers" data-i18n="navHeaders">Headers</a>
+      <a href="#errors" data-i18n="navErrors">Error Codes</a>
+      <a href="#full" data-i18n="navFull">Full Examples</a>
+    </div>
+  </div>
+
+  <div class="ver-notice" id="verNotice">
+    <i class="fa-solid fa-circle-info"></i>
+    <span data-i18n="verNotice"></span>
+  </div>
+
+  <div style="margin-right:0">
+  <!-- ======================== Introduction ======================== -->
+  <h1 data-i18n="title" class="animate-fade-in-up delay-1">KJK Encryptor API Documentation</h1>
+  <p class="intro animate-fade-in-up delay-2" data-i18n="intro">
+    KJK Encryptor provides a local HTTP API server for programmatic encryption and decryption.
+    The server runs entirely on your machine — no data is sent to any external service.
+  </p>
+
+  <div id="intro" class="card animate-fade-in-up delay-3" data-since="1.0.1">
+    <h2 data-i18n="introTitle">1. Introduction</h2>
+    <div data-lang="en">
+      <p><strong>What is the KJK API?</strong></p>
+      <p>The KJK Encryptor API is a lightweight HTTP server built into the desktop application. It allows you to encrypt files, text, and decrypt <code>.kjk</code> packages programmatically from scripts, command-line tools, or other applications running on the same machine.</p>
+      <p><strong>Key features:</strong></p>
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li>Runs locally on <code>127.0.0.1</code> — no external network access required</li>
+        <li>Supports both binary and JSON request formats</li>
+        <li>Cross-platform compatible (Linux, macOS, Windows)</li>
+        <li>Optional password protection with PBKDF2/Argon2 hashing</li>
+      </ul>
+    </div>
+    <div data-lang="zh-HK">
+      <p><strong>KJK API 係咩?</strong></p>
+      <p>KJK Encryptor API 係內嵌喺桌面應用程式入面嘅輕量級 HTTP 伺服器。佢畀你透過腳本、命令列工具或者喺同一部機上面行嘅其他程式,以編程方式加密檔案、文字同解密 <code>.kjk</code> 套件。</p>
+      <p><strong>主要特點:</strong></p>
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li>喺 <code>127.0.0.1</code> 本地運行 — 唔需要外部網路存取</li>
+        <li>支援 binary 同 JSON 兩種請求格式</li>
+        <li>跨平台兼容 (Linux、macOS、Windows)</li>
+        <li>可選密碼保護,使用 PBKDF2/Argon2 雜湊</li>
+      </ul>
+    </div>
+    <div data-lang="zh-CN">
+      <p><strong>KJK API 是什么?</strong></p>
+      <p>KJK Encryptor API 是内嵌在桌面应用程序中的轻量级 HTTP 服务器。它允许您通过脚本、命令行工具或同一台机器上运行的其他程序,以编程方式加密文件、文本和解密 <code>.kjk</code> 包。</p>
+      <p><strong>主要特点:</strong></p>
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li>在 <code>127.0.0.1</code> 本地运行 — 无需外部网络访问</li>
+        <li>支持二进制和 JSON 两种请求格式</li>
+        <li>跨平台兼容 (Linux、macOS、Windows)</li>
+        <li>可选密码保护,使用 PBKDF2/Argon2 哈希</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ======================== Version & Compatibility ======================== -->
+  <div id="compat" class="card" data-since="1.0.1">
+    <h2 data-i18n="compatTitle">2. Version &amp; Compatibility</h2>
+
+    <div data-lang="en">
+      <p>This page documents multiple releases of the KJK API. Use the <strong>version selector</strong> in the top bar to view the documentation from a specific version&#39;s perspective; sections introduced in later versions are hidden when you select an older one.</p>
+    </div>
+    <div data-lang="zh-HK">
+      <p>本頁記錄 KJK API 嘅多個版本。使用頂欄嘅 <strong>版本選擇器</strong>,可以從特定版本嘅角度檢視文件;選取較舊版本時,較新版本先引入嘅章節會被隱藏。</p>
+    </div>
+    <div data-lang="zh-CN">
+      <p>本页记录 KJK API 的多个版本。使用顶栏的 <strong>版本选择器</strong>,可从特定版本的角度查看文档;选择较旧版本时,较新版本才引入的章节会被隐藏。</p>
+    </div>
+
+    <h4 data-i18n="verHistoryTitle">Version history</h4>
+    <div data-lang="en">
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li><strong>v1.0.4 (current)</strong> — Adds 6 package-management endpoints: <code>/package/open</code>, <code>/package/append</code>, <code>/package/rename</code>, <code>/package/delete</code>, <code>/package/change-password</code>, <code>/package/verify</code>. A strict superset of v1.0.3; all existing endpoints are unchanged.</li>
+        <li><strong>v1.0.3 (previous)</strong> — Adds <code>/settings/compat-format</code> and <code>/detect-format</code>. Fully compatible with the v1.0.1/v1.0.2 API.</li>
+        <li><strong>v1.0.1 / v1.0.2</strong> — Initial API: <code>/status</code>, <code>/encrypt</code>, <code>/decrypt</code>, <code>/shutdown</code>.</li>
+      </ul>
+    </div>
+    <div data-lang="zh-HK">
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li><strong>v1.0.4 (目前)</strong> — 新增 6 個套件管理端點:<code>/package/open</code>、<code>/package/append</code>、<code>/package/rename</code>、<code>/package/delete</code>、<code>/package/change-password</code>、<code>/package/verify</code>。係 v1.0.3 嘅嚴格超集;現有端點全部不變。</li>
+        <li><strong>v1.0.3 (上一版)</strong> — 新增 <code>/settings/compat-format</code> 同 <code>/detect-format</code>。與 v1.0.1/v1.0.2 API 完全兼容。</li>
+        <li><strong>v1.0.1 / v1.0.2</strong> — 初始 API:<code>/status</code>、<code>/encrypt</code>、<code>/decrypt</code>、<code>/shutdown</code>。</li>
+      </ul>
+    </div>
+    <div data-lang="zh-CN">
+      <ul style="margin-left:20px;margin-bottom:12px;color:var(--text-secondary)">
+        <li><strong>v1.0.4（当前）</strong> — 新增 6 个包管理端点:<code>/package/open</code>、<code>/package/append</code>、<code>/package/rename</code>、<code>/package/delete</code>、<code>/package/change-password</code>、<code>/package/verify</code>。是 v1.0.3 的严格超集;现有端点全部不变。</li>
+        <li><strong>v1.0.3（上一版）</strong> — 新增 <code>/settings/compat-format</code> 和 <code>/detect-format</code>。与 v1.0.1/v1.0.2 API 完全兼容。</li>
+        <li><strong>v1.0.1 / v1.0.2</strong> — 初始 API:<code>/status</code>、<code>/encrypt</code>、<code>/decrypt</code>、<code>/shutdown</code>。</li>
+      </ul>
+    </div>
+
+    <h4 data-i18n="verEndpointMap">Endpoint introduction map</h4>
+    <table>
+      <tr><th data-i18n="verColEndpoint">Endpoint</th><th data-i18n="verColMethod">Method</th><th data-i18n="verColSince">Introduced</th></tr>
+      <tr><td><code>/status</code></td><td>GET</td><td><span class="ver-badge">v1.0.1</span></td></tr>
+      <tr><td><code>/encrypt</code></td><td>POST</td><td><span class="ver-badge">v1.0.1</span></td></tr>
+      <tr><td><code>/decrypt</code></td><td>POST</td><td><span class="ver-badge">v1.0.1</span></td></tr>
+      <tr><td><code>/shutdown</code></td><td>POST</td><td><span class="ver-badge">v1.0.1</span></td></tr>
+      <tr><td><code>/settings/compat-format</code></td><td>GET / POST</td><td><span class="ver-badge">v1.0.3</span></td></tr>
+      <tr><td><code>/detect-format</code></td><td>POST</td><td><span class="ver-badge">v1.0.3</span></td></tr>
+      <tr><td><code>/package/open</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+      <tr><td><code>/package/append</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+      <tr><td><code>/package/rename</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+      <tr><td><code>/package/delete</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+      <tr><td><code>/package/change-password</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+      <tr><td><code>/package/verify</code></td><td>POST</td><td><span class="ver-badge">v1.0.4</span></td></tr>
+    </table>
+
+    <div class="notice info">
+      <div data-lang="en"><strong>Backward compatibility:</strong> compared to v1.0.3, v1.0.4 only <em>adds</em> the 6 package-management endpoints. Every endpoint present in v1.0.3 (and further back in v1.0.1/v1.0.2) keeps its exact request/response contract — the API has remained a strict superset from v1.0.1 through v1.0.4, never changing existing behavior. Any client written against v1.0.3, v1.0.2, or v1.0.1 runs unchanged against v1.0.4.</div>
+      <div data-lang="zh-HK"><strong>向下兼容:</strong> 相較於 v1.0.3,v1.0.4 只<em>新增</em>咗 6 個套件管理端點。v1.0.3(以及更早嘅 v1.0.1/v1.0.2)已有嘅每個端點,請求/回應契約都完全不變——API 由 v1.0.1 到 v1.0.4 一直保持嚴格超集,從未改變既有行為。因此按 v1.0.3、v1.0.2 或 v1.0.1 編寫嘅任何客戶端都可以喺 v1.0.4 上原樣執行。</div>
+      <div data-lang="zh-CN"><strong>向下兼容:</strong> 相较于 v1.0.3,v1.0.4 只是<em>新增</em>了 6 个包管理端点。v1.0.3(以及更早的 v1.0.1/v1.0.2)已有的每个端点,请求/响应契约都完全不变——API 从 v1.0.1 到 v1.0.4 一直保持严格超集,从未改变既有行为。因此按 v1.0.3、v1.0.2 或 v1.0.1 编写的任何客户端都能在 v1.0.4 上原样运行。</div>
+    </div>
+  </div>
+
+  <!-- ======================== Quick Start ======================== -->
+  <div id="quickstart" class="card" data-since="1.0.1">
+    <h2 data-i18n="quickTitle">3. Quick Start</h2>
+    <div data-lang="en">
+      <p>Before using the API, you must enable it in <strong>Settings → API Server</strong> in the KJK Encryptor app, or start it programmatically in Python:</p>
+    </div>
+    <div data-lang="zh-HK">
+      <p>使用 API 之前,您必須喺 KJK Encryptor 應用程式嘅 <strong>設定 → API 伺服器</strong> 啟用佢,或者喺 Python 度以編程方式啟動:</p>
+    </div>
+    <div data-lang="zh-CN">
+      <p>使用 API 之前,您必须在 KJK Encryptor 应用程序的 <strong>设置 → API 服务器</strong> 中启用它,或在 Python 中以编程方式启动:</p>
+    </div>
+    <pre><code># Python
+from api_server import start_server
+url = start_server(port=5000)  # returns http://127.0.0.1:5000</code></pre>
+
+    <div data-lang="en">
+      <p>Default port is <code>5000</code>. The server listens only on <code>127.0.0.1</code> (localhost) for security.</p>
+    </div>
+    <div data-lang="zh-HK">
+      <p>預設埠號係 <code>5000</code>。伺服器只會喺 <code>127.0.0.1</code> (本機) 監聽,以確保安全。</p>
+    </div>
+    <div data-lang="zh-CN">
+      <p>默认端口为 <code>5000</code>。服务器仅在 <code>127.0.0.1</code> (本机) 上监听,以确保安全。</p>
+    </div>
+
+    <div class="notice info">
+      <div data-lang="en"><strong>Tip:</strong> Replace <code>127.0.0.1:5000</code> with your actual host and port if you changed the configuration.</div>
+      <div data-lang="zh-HK"><strong>提示:</strong> 如果您修改過設定,請將 <code>127.0.0.1:5000</code> 換成您實際嘅主機同埠號。</div>
+      <div data-lang="zh-CN"><strong>提示:</strong> 如果您修改过配置,请将 <code>127.0.0.1:5000</code> 替换为您实际的主机和端口。</div>
+    </div>
+  </div>
+
+  <!-- ======================== /status ======================== -->
+  <div id="status" class="card" data-since="1.0.1">
+    <h2 data-i18n="statusTitle">4. Status Check</h2>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/status</span>
+    </div>
+
+    <div data-lang="en"><p>Check whether the API server is running. Returns server name and version. No authentication required.</p></div>
+    <div data-lang="zh-HK"><p>檢查 API 伺服器係咪運行緊。傳回伺服器名稱同版本。唔需要認證。</p></div>
+    <div data-lang="zh-CN"><p>检查 API 服务器是否正在运行。返回服务器名称和版本。无需认证。</p></div>
+
+    <h4 data-i18n="reqHeaders">Request Headers</h4>
+    <table>
+      <tr><th>Header</th><th>Value</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>Content-Type</code></td><td><code>application/json</code></td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="statusHdrDesc">Recommended but not strictly required for GET</td></tr>
+      <tr><td><code>User-Agent</code></td><td><code>KJK-Client/1.0</code></td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="uaDesc">Client identifier for logging</td></tr>
+    </table>
+
+    <h4 data-i18n="linuxExample">Linux / macOS (bash + curl)</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code>curl -X GET http://127.0.0.1:5000/status \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: KJK-Client/1.0"</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code>$headers = @{
+    "Content-Type" = "application/json"
+    "User-Agent"   = "KJK-Client/1.0"
+}
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/status" `
+    -Method GET `
+    -Headers $headers</code></pre>
+
+    <h4 data-i18n="response">Response</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{
+  "status": "ok",
+  "name": "KJK Encryptor API",
+  "version": "1.0.1"
+}</code></pre>
+  </div>
+
+  <!-- ======================== /encrypt ======================== -->
+  <div id="encrypt" class="card" data-since="1.0.1">
+    <h2 data-i18n="encryptTitle">5. Encrypt</h2>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/encrypt</span>
+    </div>
+
+    <div data-lang="en"><p>Encrypt data and return a <code>.kjk</code> package. Supports two request formats: <strong>binary upload</strong> (recommended for files) and <strong>JSON</strong> (for text).</p></div>
+    <div data-lang="zh-HK"><p>加密資料並傳回 <code>.kjk</code> 套件。支援兩種請求格式:<strong>二進位上傳</strong> (檔案推薦) 同 <strong>JSON</strong> (文字用)。</p></div>
+    <div data-lang="zh-CN"><p>加密数据并返回 <code>.kjk</code> 包。支持两种请求格式:<strong>二进制上传</strong> (文件推荐) 和 <strong>JSON</strong> (用于文本)。</p></div>
+
+    <h4 data-i18n="reqHeaders">Request Headers</h4>
+    <table>
+      <tr><th>Header</th><th>Value</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>Content-Type</code></td><td><code>application/octet-stream</code> or <code>application/json</code></td><td><span class="badge required" data-i18n="required">Required</span></td><td data-i18n="encHdrCtDesc">Determines how the body is parsed</td></tr>
+      <tr><td><code>User-Agent</code></td><td><code>KJK-Client/1.0</code></td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="uaDesc">Client identifier for logging</td></tr>
+    </table>
+
+    <h4 data-i18n="queryParams">Query Parameters</h4>
+    <table>
+      <tr><th>Param</th><th>Type</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>password</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="encPwdDesc">Password for encryption (empty = no password)</td></tr>
+      <tr><td><code>filename</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="encFnDesc">Original filename (default: untitled)</td></tr>
+      <tr><td><code>ext</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="encExtDesc">File extension (default: txt)</td></tr>
+      <tr><td><code>format</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="encFmtDesc">Response format: <code>json</code> or file download (default)</td></tr>
+    </table>
+
+    <h3 data-i18n="encExample1">Example 1: Binary Upload (Recommended for Files)</h3>
+    <div data-lang="en"><p>Upload a file as raw binary. The response will be a <code>.kjk</code> file download.</p></div>
+    <div data-lang="zh-HK"><p>以原始二進位上傳檔案。回應會係 <code>.kjk</code> 檔案下載。</p></div>
+    <div data-lang="zh-CN"><p>以原始二进制上传文件。响应将是 <code>.kjk</code> 文件下载。</p></div>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code># Encrypt without password
+curl -X POST http://127.0.0.1:5000/encrypt \
+  --data-binary @myfile.txt \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o encrypted.kjk
+
+# Encrypt with password (URL-encoded)
+curl -X POST "http://127.0.0.1:5000/encrypt?password=mypassword&filename=myfile&ext=txt" \
+  --data-binary @myfile.txt \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o encrypted.kjk</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code># Encrypt without password
+$bytes = [System.IO.File]::ReadAllBytes("myfile.txt")
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/encrypt" `
+    -Method POST `
+    -ContentType "application/octet-stream" `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" } `
+    -Body $bytes `
+    -OutFile "encrypted.kjk"
+
+# Encrypt with password
+$bytes = [System.IO.File]::ReadAllBytes("myfile.txt")
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/encrypt?password=mypassword&filename=myfile&ext=txt" `
+    -Method POST `
+    -ContentType "application/octet-stream" `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" } `
+    -Body $bytes `
+    -OutFile "encrypted.kjk"</code></pre>
+
+    <h3 data-i18n="encExample2">Example 2: JSON Format (For Text)</h3>
+    <div data-lang="en"><p>Send text data as JSON. Useful for short strings or when you want the ciphertext in the response.</p></div>
+    <div data-lang="zh-HK"><p>以 JSON 格式傳送文字資料。適合短字串或者當您想喺回應中取得密文時使用。</p></div>
+    <div data-lang="zh-CN"><p>以 JSON 格式发送文本数据。适合短字符串或当您想在响应中获取密文时使用。</p></div>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code>curl -X POST "http://127.0.0.1:5000/encrypt?format=json" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -d '{"data": "Hello World!", "password": "secret123"}'</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code>$body = @{ data = "Hello World!"; password = "secret123" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/encrypt?format=json" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" } `
+    -Body $body</code></pre>
+
+    <h4 data-i18n="response">Response (format=json)</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{
+  "ciphertext": "誷竊蛦唄咚...",
+  "kjk": "KJKv5\n2\n..."
+}</code></pre>
+
+    <div class="notice warning">
+      <div data-lang="en"><strong>Note:</strong> When using <code>password</code>, the <code>.kjk</code> file will contain a password header entry. Each <code>.kjk</code> file uses a single password.</div>
+      <div data-lang="zh-HK"><strong>注意:</strong> 使用 <code>password</code> 時,<code>.kjk</code> 檔案會包含密碼頭條目。每個 <code>.kjk</code> 檔案只用一個密碼。</div>
+      <div data-lang="zh-CN"><strong>注意:</strong> 使用 <code>password</code> 时,<code>.kjk</code> 文件将包含密码头条目。每个 <code>.kjk</code> 文件只使用一个密码。</div>
+    </div>
+  </div>
+
+  <!-- ======================== /decrypt ======================== -->
+  <div id="decrypt" class="card" data-since="1.0.1">
+    <h2 data-i18n="decryptTitle">6. Decrypt</h2>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/decrypt</span>
+    </div>
+
+    <div data-lang="en"><p>Decrypt a <code>.kjk</code> package and return the original file(s). Supports both binary upload and JSON request.</p></div>
+    <div data-lang="zh-HK"><p>解密 <code>.kjk</code> 套件並傳回原始檔案。支援二進位上傳同 JSON 請求。</p></div>
+    <div data-lang="zh-CN"><p>解密 <code>.kjk</code> 包并返回原始文件。支持二进制上传和 JSON 请求。</p></div>
+
+    <h4 data-i18n="reqHeaders">Request Headers</h4>
+    <table>
+      <tr><th>Header</th><th>Value</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>Content-Type</code></td><td><code>application/octet-stream</code> or <code>application/json</code></td><td><span class="badge required" data-i18n="required">Required</span></td><td data-i18n="decHdrCtDesc">Determines request parsing</td></tr>
+      <tr><td><code>User-Agent</code></td><td><code>KJK-Client/1.0</code></td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="uaDesc">Client identifier</td></tr>
+    </table>
+
+    <h4 data-i18n="queryParams">Query Parameters</h4>
+    <table>
+      <tr><th>Param</th><th>Type</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>password</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="decPwdDesc">Password (required if the .kjk file is encrypted)</td></tr>
+      <tr><td><code>format</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="decFmtDesc">Response format: <code>json</code> (all files) or file download (first file)</td></tr>
+    </table>
+
+    <h3 data-i18n="decExample1">Example 1: Binary Upload (Decrypt File)</h3>
+    <div data-lang="en"><p>Upload the <code>.kjk</code> file as binary. Response is the decrypted file.</p></div>
+    <div data-lang="zh-HK"><p>以二進位上傳 <code>.kjk</code> 檔案。回應係解密後嘅檔案。</p></div>
+    <div data-lang="zh-CN"><p>以二进制上传 <code>.kjk</code> 文件。响应是解密后的文件。</p></div>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code># Decrypt without password
+curl -X POST http://127.0.0.1:5000/decrypt \
+  --data-binary @encrypted.kjk \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o decrypted.txt
+
+# Decrypt with password
+curl -X POST "http://127.0.0.1:5000/decrypt?password=mypassword" \
+  --data-binary @encrypted.kjk \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o decrypted.txt</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code># Decrypt with password
+$bytes = [System.IO.File]::ReadAllBytes("encrypted.kjk")
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/decrypt?password=mypassword" `
+    -Method POST `
+    -ContentType "application/octet-stream" `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" } `
+    -Body $bytes `
+    -OutFile "decrypted.txt"</code></pre>
+
+    <h3 data-i18n="decExample2">Example 2: JSON Format (Get All Files)</h3>
+    <div data-lang="en"><p>Send the <code>.kjk</code> content as JSON text. Response includes all files in the package.</p></div>
+    <div data-lang="zh-HK"><p>以 JSON 文字格式傳送 <code>.kjk</code> 內容。回應包含套件入面所有檔案。</p></div>
+    <div data-lang="zh-CN"><p>以 JSON 文本格式发送 <code>.kjk</code> 内容。响应包含包中的所有文件。</p></div>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code>curl -X POST "http://127.0.0.1:5000/decrypt?password=mypassword&format=json" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -d '{"kjk": "KJKv5\n2\n..."}'</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code>$kjkContent = Get-Content "encrypted.kjk" -Raw
+$body = @{ kjk = $kjkContent; password = "mypassword" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/decrypt?format=json" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" } `
+    -Body $body</code></pre>
+
+    <h4 data-i18n="response">Response (format=json)</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{
+  "files": [
+    {
+      "name": "myfile.txt",
+      "data": "Hello World!",
+      "size": 12
+    }
+  ]
+}</code></pre>
+
+    <div class="notice danger">
+      <div data-lang="en"><strong>Important:</strong> If the <code>.kjk</code> file is encrypted, you must provide the correct <code>password</code>. A wrong password returns HTTP <code>401</code>.</div>
+      <div data-lang="zh-HK"><strong>重要:</strong> 如果 <code>.kjk</code> 檔案有加密,您必須提供正確嘅 <code>password</code>。密碼錯誤會傳回 HTTP <code>401</code>。</div>
+      <div data-lang="zh-CN"><strong>重要:</strong> 如果 <code>.kjk</code> 文件已加密,您必须提供正确的 <code>password</code>。密码错误将返回 HTTP <code>401</code>。</div>
+    </div>
+  </div>
+
+  <!-- ======================== /settings/compat-format ======================== -->
+  <div id="settings" class="card" data-since="1.0.3">
+    <h2 data-i18n="settingsTitle">7. Settings — Format Compatibility</h2>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/settings/compat-format</span>
+    </div>
+
+    <div data-lang="en"><p>Get or set the format compatibility mode used when encrypting. The mode controls which legacy <code>.kjk</code> format the new package is written in, so old versions of the app can still open it.</p></div>
+    <div data-lang="zh-HK"><p>取得或設定加密時使用嘅格式兼容模式。模式控制新套件以邊種舊版 <code>.kjk</code> 格式寫入,令舊版應用程式仍然可以開啟。</p></div>
+    <div data-lang="zh-CN"><p>获取或设置加密时使用的格式兼容模式。该模式控制新包以哪种旧版 <code>.kjk</code> 格式写入,以便旧版应用仍可打开。</p></div>
+
+    <h4 data-i18n="queryParams">Query Parameters</h4>
+    <table>
+      <tr><th>Param</th><th>Type</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>format</code></td><td>string</td><td><span class="badge optional" data-i18n="optional">Optional</span></td><td data-i18n="setFmtDesc">POST only. One of <code>auto</code>, <code>KJKv7</code>, <code>KJKv5</code>. Omit to read the current value.</td></tr>
+    </table>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code># Read current setting
+curl -X GET http://127.0.0.1:5000/settings/compat-format
+
+# Set to KJKv7
+curl -X POST http://127.0.0.1:5000/settings/compat-format \
+  -H "Content-Type: application/json" \
+  -d '{"format": "KJKv7"}'</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code># Read current setting
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/settings/compat-format" -Method GET
+
+# Set to KJKv7
+$body = @{ format = "KJKv7" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/settings/compat-format" `
+    -Method POST -ContentType "application/json" -Body $body</code></pre>
+
+    <h4 data-i18n="response">Response</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{
+  "format": "auto",
+  "options": ["auto", "KJKv7", "KJKv5"],
+  "label": "Auto (自动检测)"
+}</code></pre>
+  </div>
+
+  <!-- ======================== /detect-format ======================== -->
+  <div id="detect" class="card" data-since="1.0.3">
+    <h2 data-i18n="detectTitle">8. Detect Format</h2>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/detect-format</span>
+    </div>
+
+    <div data-lang="en"><p>Detect the format version of a <code>.kjk</code> package by its content. Useful for deciding which decryption path to use.</p></div>
+    <div data-lang="zh-HK"><p>透過內容偵測 <code>.kjk</code> 套件嘅格式版本。用嚟決定應該用邊條解密路徑。</p></div>
+    <div data-lang="zh-CN"><p>通过内容检测 <code>.kjk</code> 包的格式版本。用于决定使用哪条解密路径。</p></div>
+
+    <h4 data-i18n="reqHeaders">Request Headers</h4>
+    <table>
+      <tr><th>Header</th><th>Value</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>Content-Type</code></td><td><code>application/json</code> or <code>application/octet-stream</code></td><td><span class="badge required" data-i18n="required">Required</span></td><td data-i18n="detHdrCtDesc">Determines how the body is parsed</td></tr>
+    </table>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code>curl -X POST http://127.0.0.1:5000/detect-format \
+  -H "Content-Type: application/json" \
+  -d '{"kjk": "KJKv5\n1\n..."}'</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code>$kjkContent = Get-Content "encrypted.kjk" -Raw
+$body = @{ kjk = $kjkContent } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/detect-format" `
+    -Method POST -ContentType "application/json" -Body $body</code></pre>
+
+    <h4 data-i18n="response">Response</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{ "format": "KJKv5" }</code></pre>
+  </div>
+
+  <!-- ======================== /package/* ======================== -->
+  <div id="package" class="card" data-since="1.0.4">
+    <h2 data-i18n="packageTitle">9. Package Management (KJKv9)</h2>
+    <div data-lang="en"><p>Manage <code>.kjk</code> packages on disk: list entries, append files, rename, delete, change the password, and verify integrity. All endpoints accept a JSON body and operate on the package file located at <code>path</code> on the local machine.</p></div>
+    <div data-lang="zh-HK"><p>管理磁碟上嘅 <code>.kjk</code> 套件:列出條目、追加檔案、重新命名、刪除、修改密碼同驗證完整性。所有端點都接受 JSON 主體,並對本機 <code>path</code> 位置嘅套件檔案進行操作。</p></div>
+    <div data-lang="zh-CN"><p>管理磁盘上的 <code>.kjk</code> 包:列出条目、追加文件、重命名、删除、修改密码和验证完整性。所有端点都接受 JSON 请求体,并对本机 <code>path</code> 位置的包文件进行操作。</p></div>
+
+    <div class="notice info">
+      <div data-lang="en"><strong>Note:</strong> Package management endpoints only support the KJKv9 format. Legacy formats (KJKv5/KJKv7) must be converted or handled through <code>/decrypt</code>.</div>
+      <div data-lang="zh-HK"><strong>注意:</strong> 包管理端點只支援 KJKv9 格式。舊版格式 (KJKv5/KJKv7) 需要轉換,或者透過 <code>/decrypt</code> 處理。</div>
+      <div data-lang="zh-CN"><strong>注意:</strong> 包管理端点仅支持 KJKv9 格式。旧版格式 (KJKv5/KJKv7) 需要转换,或通过 <code>/decrypt</code> 处理。</div>
+    </div>
+
+    <h3 data-i18n="pkgOpenTitle">9.1 Open Package — <code>POST /package/open</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/open</span>
+    </div>
+    <div data-lang="en"><p>Open a KJKv9 package and return its entry list. Returns <code>401</code> if the package is password-protected and the password is missing or wrong.</p></div>
+    <div data-lang="zh-HK"><p>開啟 KJKv9 套件並傳回條目清單。如果套件有密碼保護而密碼缺失或錯誤,會傳回 <code>401</code>。</p></div>
+    <div data-lang="zh-CN"><p>打开 KJKv9 包并返回条目列表。如果包受密码保护而密码缺失或错误,将返回 <code>401</code>。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123"
+}
+
+# Response
+{
+  "format": "kjk9",
+  "has_password": true,
+  "files": [
+    { "name": "docs/readme.txt", "size": 2048, "mtime": 1700000000 },
+    { "name": "photo.jpg", "size": 512000, "mtime": 1700000000 }
+  ]
+}</code></pre>
+
+    <h3 data-i18n="pkgAppendTitle">9.2 Append Files — <code>POST /package/append</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/append</span>
+    </div>
+    <div data-lang="en"><p>Add files into the package and save immediately. Each item in <code>files</code> has a local <code>src_path</code> and an optional <code>relpath</code> (defaults to the file name). Returns the updated entry list.</p></div>
+    <div data-lang="zh-HK"><p>將檔案加入套件並立即儲存。<code>files</code> 入面每一項都有本機 <code>src_path</code> 同可選嘅 <code>relpath</code> (預設係檔名)。傳回更新後嘅條目清單。</p></div>
+    <div data-lang="zh-CN"><p>将文件加入包并立即保存。<code>files</code> 中每一项都有本地 <code>src_path</code> 和可选的 <code>relpath</code> (默认为文件名)。返回更新后的条目列表。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123",
+  "files": [
+    { "src_path": "C:\\tmp\\new.txt", "relpath": "docs/new.txt" },
+    { "src_path": "C:\\tmp\\logo.png" }
+  ]
+}
+
+# Response
+{
+  "status": "ok",
+  "added": 2,
+  "files": [ ... ]
+}</code></pre>
+
+    <h3 data-i18n="pkgRenameTitle">9.3 Rename Entry — <code>POST /package/rename</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/rename</span>
+    </div>
+    <div data-lang="en"><p>Rename an entry inside the package. Returns <code>400</code> if the target name already exists.</p></div>
+    <div data-lang="zh-HK"><p>重新命名套件入面嘅條目。如果目標名稱已存在,會傳回 <code>400</code>。</p></div>
+    <div data-lang="zh-CN"><p>重命名包内的条目。如果目标名称已存在,将返回 <code>400</code>。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123",
+  "old": "docs/new.txt",
+  "new": "docs/renamed.txt"
+}
+
+# Response
+{ "status": "ok", "files": [ ... ] }</code></pre>
+
+    <h3 data-i18n="pkgDeleteTitle">9.4 Delete Entries — <code>POST /package/delete</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/delete</span>
+    </div>
+    <div data-lang="en"><p>Delete one or more entries from the package. <code>relpaths</code> is a list of entry paths to remove.</p></div>
+    <div data-lang="zh-HK"><p>從套件刪除一個或多個條目。<code>relpaths</code> 係要移除嘅條目路徑清單。</p></div>
+    <div data-lang="zh-CN"><p>从包中删除一个或多个条目。<code>relpaths</code> 是要移除的条目路径列表。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123",
+  "relpaths": ["docs/renamed.txt", "old.log"]
+}
+
+# Response
+{ "status": "ok", "deleted": 2, "files": [ ... ] }</code></pre>
+
+    <h3 data-i18n="pkgPwdTitle">9.5 Change Password — <code>POST /package/change-password</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/change-password</span>
+    </div>
+    <div data-lang="en"><p>Change the package password. Pass an empty <code>new_password</code> to remove password protection entirely.</p></div>
+    <div data-lang="zh-HK"><p>修改套件密碼。傳入空嘅 <code>new_password</code> 可以完全移除密碼保護。</p></div>
+    <div data-lang="zh-CN"><p>修改包密码。传入空的 <code>new_password</code> 可完全移除密码保护。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123",
+  "new_password": "newpass456"
+}
+
+# Response
+{ "status": "ok" }</code></pre>
+
+    <h3 data-i18n="pkgVerifyTitle">9.6 Verify Package — <code>POST /package/verify</code></h3>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/package/verify</span>
+    </div>
+    <div data-lang="en"><p>Verify that a file is a valid KJKv9 package and that the provided password is correct. Does not modify the file.</p></div>
+    <div data-lang="zh-HK"><p>驗證檔案係咪有效嘅 KJKv9 套件,以及提供嘅密碼係咪正確。唔會修改檔案。</p></div>
+    <div data-lang="zh-CN"><p>验证文件是否为有效的 KJKv9 包,以及提供的密码是否正确。不会修改文件。</p></div>
+    <span class="code-label json">json</span>
+    <pre><code># Request
+{
+  "path": "C:\\data\\my.kjk",
+  "password": "secret123"
+}
+
+# Response
+{
+  "valid": true,
+  "format": "kjk9",
+  "has_password": true
+}</code></pre>
+  </div>
+
+  <!-- ======================== /shutdown ======================== -->
+  <div id="shutdown" class="card" data-since="1.0.1">
+    <h2 data-i18n="shutdownTitle">10. Shutdown Server</h2>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="endpoint-url">http://127.0.0.1:5000/shutdown</span>
+    </div>
+
+    <div data-lang="en"><p>Safely shut down the API server. No request body required.</p></div>
+    <div data-lang="zh-HK"><p>安全關閉 API 伺服器。唔需要請求主體。</p></div>
+    <div data-lang="zh-CN"><p>安全关闭 API 服务器。无需请求体。</p></div>
+
+    <h4 data-i18n="linuxExample">Linux / macOS</h4>
+    <span class="code-label linux">bash</span>
+    <pre><code>curl -X POST http://127.0.0.1:5000/shutdown \
+  -H "User-Agent: KJK-Client/1.0"</code></pre>
+
+    <h4 data-i18n="winExample">Windows (PowerShell)</h4>
+    <span class="code-label windows">powershell</span>
+    <pre><code>Invoke-RestMethod -Uri "http://127.0.0.1:5000/shutdown" `
+    -Method POST `
+    -Headers @{ "User-Agent" = "KJK-Client/1.0" }</code></pre>
+
+    <h4 data-i18n="response">Response</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{ "status": "shutting down" }</code></pre>
+  </div>
+
+  <!-- ======================== Headers Reference ======================== -->
+  <div id="headers" class="card" data-since="1.0.1">
+    <h2 data-i18n="headersTitle">11. Request Headers Reference</h2>
+    <div data-lang="en"><p>Complete reference of HTTP headers used by the KJK API.</p></div>
+    <div data-lang="zh-HK"><p>KJK API 使用嘅 HTTP 標頭完整參考。</p></div>
+    <div data-lang="zh-CN"><p>KJK API 使用的 HTTP 标头完整参考。</p></div>
+
+    <table>
+      <tr><th>Header</th><th>Typical Value</th><th data-i18n="reqRequired">Required</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr>
+        <td><code>Content-Type</code></td>
+        <td><code>application/octet-stream</code><br><code>application/json</code></td>
+        <td><span class="badge required" data-i18n="required">Required</span></td>
+        <td data-i18n="hdrCtDesc">Determines how the server parses the request body. Use <code>application/octet-stream</code> for binary file uploads, <code>application/json</code> for JSON payloads.</td>
+      </tr>
+      <tr>
+        <td><code>User-Agent</code></td>
+        <td><code>KJK-Client/1.0</code></td>
+        <td><span class="badge optional" data-i18n="optional">Optional</span></td>
+        <td data-i18n="hdrUaDesc">Identifies the client application. Useful for logging and debugging. Any string is accepted.</td>
+      </tr>
+      <tr>
+        <td><code>Accept</code></td>
+        <td><code>application/json</code><br><code>application/octet-stream</code></td>
+        <td><span class="badge optional" data-i18n="optional">Optional</span></td>
+        <td data-i18n="hdrAcceptDesc">Hint to the server about the desired response format. The <code>format</code> query parameter takes precedence.</td>
+      </tr>
+      <tr>
+        <td><code>Authorization</code></td>
+        <td>—</td>
+        <td><span class="badge optional" data-i18n="optional">Optional</span></td>
+        <td data-i18n="hdrAuthDesc">Not used. Authentication is via the <code>password</code> query parameter or JSON body field.</td>
+      </tr>
+    </table>
+
+    <div class="notice info">
+      <div data-lang="en"><strong>Why no <code>Authorization</code> header?</strong> The KJK API uses password-based encryption, not HTTP authentication. The password is passed as a query parameter or in the JSON body, and is used to encrypt/decrypt the data — not to authenticate the HTTP request.</div>
+      <div data-lang="zh-HK"><strong>點解冇 <code>Authorization</code> 標頭?</strong> KJK API 用嘅係基於密碼嘅加密,唔係 HTTP 認證。密碼以查詢參數或 JSON 主體欄位傳遞,用嚟加密/解密資料 — 唔係用嚟認證 HTTP 請求。</div>
+      <div data-lang="zh-CN"><strong>为什么没有 <code>Authorization</code> 标头?</strong> KJK API 使用基于密码的加密,而非 HTTP 认证。密码作为查询参数或 JSON 体字段传递,用于加密/解密数据 — 而不是用于认证 HTTP 请求。</div>
+    </div>
+  </div>
+
+  <!-- ======================== Error Codes ======================== -->
+  <div id="errors" class="card" data-since="1.0.1">
+    <h2 data-i18n="errorsTitle">12. Error Codes</h2>
+    <div data-lang="en"><p>HTTP status codes returned by the API.</p></div>
+    <div data-lang="zh-HK"><p>API 傳回嘅 HTTP 狀態碼。</p></div>
+    <div data-lang="zh-CN"><p>API 返回的 HTTP 状态码。</p></div>
+
+    <table>
+      <tr><th>Status</th><th data-i18n="errName">Name</th><th data-i18n="reqDesc">Description</th></tr>
+      <tr><td><code>200</code></td><td data-i18n="err200">OK</td><td data-i18n="err200Desc">Request successful</td></tr>
+      <tr><td><code>400</code></td><td data-i18n="err400">Bad Request</td><td data-i18n="err400Desc">Invalid input format or malformed request</td></tr>
+      <tr><td><code>401</code></td><td data-i18n="err401">Unauthorized</td><td data-i18n="err401Desc">Password required or wrong password provided</td></tr>
+      <tr><td><code>404</code></td><td data-i18n="err404">Not Found</td><td data-i18n="err404Desc">No files found in the package</td></tr>
+      <tr><td><code>500</code></td><td data-i18n="err500">Internal Error</td><td data-i18n="err500Desc">Server-side processing error</td></tr>
+    </table>
+
+    <h4 data-i18n="errExample">Error Response Example</h4>
+    <span class="code-label json">json</span>
+    <pre><code>{
+  "error": "password required"
+}</code></pre>
+  </div>
+
+  <!-- ======================== Full Examples ======================== -->
+  <div id="full" class="card" data-since="1.0.1">
+    <h2 data-i18n="fullTitle">13. Full Workflow Examples</h2>
+
+    <h3 data-i18n="fullBashTitle">Complete Bash Script (Linux / macOS)</h3>
+    <div data-lang="en"><p>A full script that encrypts a file, decrypts it back, and verifies the result.</p></div>
+    <div data-lang="zh-HK"><p>一個完整嘅腳本,加密檔案、解密返,並驗證結果。</p></div>
+    <div data-lang="zh-CN"><p>一个完整的脚本,加密文件、解密回来,并验证结果。</p></div>
+
+    <span class="code-label linux">bash</span>
+    <pre><code>#!/bin/bash
+# KJK Encryptor - Full workflow example
+# Usage: ./kjk_workflow.sh myfile.txt
+
+SERVER="http://127.0.0.1:5000"
+INPUT="$1"
+PASSWORD="mypassword"
+
+if [ -z "$INPUT" ]; then
+  echo "Usage: $0 &lt;file&gt;"
+  exit 1
+fi
+
+echo "=== 1. Check server status ==="
+curl -s "$SERVER/status" -H "User-Agent: KJK-Client/1.0"
+echo ""
+
+echo "=== 2. Encrypt file ==="
+curl -X POST "$SERVER/encrypt?password=$PASSWORD&filename=$(basename "$INPUT" .txt)&ext=txt" \
+  --data-binary @"$INPUT" \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o "encrypted.kjk"
+echo "Encrypted to: encrypted.kjk"
+
+echo "=== 3. Decrypt file ==="
+curl -X POST "$SERVER/decrypt?password=$PASSWORD" \
+  --data-binary @encrypted.kjk \
+  -H "Content-Type: application/octet-stream" \
+  -H "User-Agent: KJK-Client/1.0" \
+  -o "decrypted.txt"
+echo "Decrypted to: decrypted.txt"
+
+echo "=== 4. Verify ==="
+if diff -q "$INPUT" "decrypted.txt" &gt;/dev/null; then
+  echo "✅ Success: files match!"
+else
+  echo "❌ Error: files differ!"
+fi</code></pre>
+
+    <h3 data-i18n="fullPwshTitle">Complete PowerShell Script (Windows)</h3>
+    <div data-lang="en"><p>The same workflow in PowerShell for Windows users.</p></div>
+    <div data-lang="zh-HK"><p>同樣嘅工作流程,PowerShell 版本,畀 Windows 用戶。</p></div>
+    <div data-lang="zh-CN"><p>相同的工作流程,PowerShell 版本,供 Windows 用户使用。</p></div>
+
+    <span class="code-label windows">powershell</span>
+    <pre><code># KJK Encryptor - Full workflow example (Windows PowerShell)
+# Usage: .\kjk_workflow.ps1 myfile.txt
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$InputFile
+)
+
+$Server = "http://127.0.0.1:5000"
+$Password = "mypassword"
+$Headers = @{ "User-Agent" = "KJK-Client/1.0" }
+
+Write-Host "=== 1. Check server status ===" -ForegroundColor Cyan
+$status = Invoke-RestMethod -Uri "$Server/status" -Method GET -Headers $Headers
+Write-Host "Server: $($status.name) v$($status.version)"
+
+Write-Host "`n=== 2. Encrypt file ===" -ForegroundColor Cyan
+$bytes = [System.IO.File]::ReadAllBytes($InputFile)
+$baseName = [System.IO.Path]::GetFileNameWithoutExtension($InputFile)
+$ext = [System.IO.Path]::GetExtension($InputFile).TrimStart(".")
+$encUrl = "$Server/encrypt?password=$Password&filename=$baseName&ext=$ext"
+Invoke-RestMethod -Uri $encUrl `
+    -Method POST `
+    -ContentType "application/octet-stream" `
+    -Headers $Headers `
+    -Body $bytes `
+    -OutFile "encrypted.kjk"
+Write-Host "Encrypted to: encrypted.kjk"
+
+Write-Host "`n=== 3. Decrypt file ===" -ForegroundColor Cyan
+$decBytes = [System.IO.File]::ReadAllBytes("encrypted.kjk")
+Invoke-RestMethod -Uri "$Server/decrypt?password=$Password" `
+    -Method POST `
+    -ContentType "application/octet-stream" `
+    -Headers $Headers `
+    -Body $decBytes `
+    -OutFile "decrypted.txt"
+Write-Host "Decrypted to: decrypted.txt"
+
+Write-Host "`n=== 4. Verify ===" -ForegroundColor Cyan
+$origHash = (Get-FileHash $InputFile).Hash
+$decHash = (Get-FileHash "decrypted.txt").Hash
+if ($origHash -eq $decHash) {
+    Write-Host "✅ Success: files match!" -ForegroundColor Green
+} else {
+    Write-Host "❌ Error: files differ!" -ForegroundColor Red
+}</code></pre>
+
+    <h3 data-i18n="fullPythonTitle">Python Example</h3>
+    <div data-lang="en"><p>Using Python's <code>requests</code> library for cross-platform compatibility.</p></div>
+    <div data-lang="zh-HK"><p>使用 Python 嘅 <code>requests</code> 程式庫,跨平台兼容。</p></div>
+    <div data-lang="zh-CN"><p>使用 Python 的 <code>requests</code> 库,跨平台兼容。</p></div>
+
+    <span class="code-label linux">python</span>
+    <pre><code>import requests
+
+SERVER = "http://127.0.0.1:5000"
+HEADERS = {"User-Agent": "KJK-Client/1.0"}
+
+# 1. Check status
+resp = requests.get(f"{SERVER}/status", headers=HEADERS)
+print("Status:", resp.json())
+
+# 2. Encrypt a file
+with open("myfile.txt", "rb") as f:
+    data = f.read()
+resp = requests.post(
+    f"{SERVER}/encrypt",
+    params={"password": "mypassword", "filename": "myfile", "ext": "txt"},
+    data=data,
+    headers={**HEADERS, "Content-Type": "application/octet-stream"},
+)
+with open("encrypted.kjk", "wb") as f:
+    f.write(resp.content)
+print("Encrypted to encrypted.kjk")
+
+# 3. Decrypt the file
+with open("encrypted.kjk", "rb") as f:
+    enc_data = f.read()
+resp = requests.post(
+    f"{SERVER}/decrypt",
+    params={"password": "mypassword"},
+    data=enc_data,
+    headers={**HEADERS, "Content-Type": "application/octet-stream"},
+)
+with open("decrypted.txt", "wb") as f:
+    f.write(resp.content)
+print("Decrypted to decrypted.txt")</code></pre>
+  </div>
+
+  <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-tertiary);font-size:13px">
+    <div data-lang="en">KJK Encryptor · DNT Group · <a href="https://dnteam.top" style="color:var(--accent);text-decoration:none">dnteam.top</a></div>
+    <div data-lang="zh-HK">KJK Encryptor · DNT Group · <a href="https://dnteam.top" style="color:var(--accent);text-decoration:none">dnteam.top</a></div>
+    <div data-lang="zh-CN">KJK Encryptor · DNT Group · <a href="https://dnteam.top" style="color:var(--accent);text-decoration:none">dnteam.top</a></div>
+  </div>
+  </div>
+</div>
+
+</div><!-- /#dnt-main -->
+
+<script>
+// ======================== Language Switching ========================
+const I18N = {
+  // Navigation
+  'navIntro': { en: 'Introduction', 'zh-HK': '簡介', 'zh-CN': '简介' },
+  'navQuick': { en: 'Quick Start', 'zh-HK': '快速開始', 'zh-CN': '快速开始' },
+  'navStatus': { en: 'Status Check', 'zh-HK': '狀態檢查', 'zh-CN': '状态检查' },
+  'navEncrypt': { en: 'Encrypt', 'zh-HK': '加密', 'zh-CN': '加密' },
+  'navDecrypt': { en: 'Decrypt', 'zh-HK': '解密', 'zh-CN': '解密' },
+  'navSettings': { en: 'Settings', 'zh-HK': '設定', 'zh-CN': '设置' },
+  'navDetect': { en: 'Detect Format', 'zh-HK': '偵測格式', 'zh-CN': '检测格式' },
+  'navPackage': { en: 'Package Management', 'zh-HK': '套件管理', 'zh-CN': '包管理' },
+  'navShutdown': { en: 'Shutdown', 'zh-HK': '關閉伺服器', 'zh-CN': '关闭服务器' },
+  'navHeaders': { en: 'Headers', 'zh-HK': '標頭', 'zh-CN': '标头' },
+  'navErrors': { en: 'Error Codes', 'zh-HK': '錯誤碼', 'zh-CN': '错误码' },
+  'navFull': { en: 'Full Examples', 'zh-HK': '完整範例', 'zh-CN': '完整示例' },
+
+  // Title & intro
+  'title': { en: 'KJK Encryptor API Documentation', 'zh-HK': 'KJK Encryptor API 文檔', 'zh-CN': 'KJK Encryptor API 文档' },
+  'intro': {
+    en: 'KJK Encryptor provides a local HTTP API server for programmatic encryption and decryption. The server runs entirely on your machine — no data is sent to any external service.',
+    'zh-HK': 'KJK Encryptor 提供本地 HTTP API 伺服器,以編程方式進行加密同解密。伺服器完全喺您嘅機器上運行 — 唔會將任何資料傳送到外部服務。',
+    'zh-CN': 'KJK Encryptor 提供本地 HTTP API 服务器,以编程方式进行加密和解密。服务器完全在您的机器上运行 — 不会将任何数据发送到外部服务。',
+  },
+
+  // Section titles
+  'introTitle': { en: '1. Introduction', 'zh-HK': '1. 簡介', 'zh-CN': '1. 简介' },
+  'compatTitle': { en: '2. Version & Compatibility', 'zh-HK': '2. 版本與兼容', 'zh-CN': '2. 版本与兼容' },
+  'quickTitle': { en: '3. Quick Start', 'zh-HK': '3. 快速開始', 'zh-CN': '3. 快速开始' },
+  'statusTitle': { en: '4. Status Check', 'zh-HK': '4. 狀態檢查', 'zh-CN': '4. 状态检查' },
+  'encryptTitle': { en: '5. Encrypt', 'zh-HK': '5. 加密', 'zh-CN': '5. 加密' },
+  'decryptTitle': { en: '6. Decrypt', 'zh-HK': '6. 解密', 'zh-CN': '6. 解密' },
+  'settingsTitle': { en: '7. Settings — Format Compatibility', 'zh-HK': '7. 設定 — 格式兼容', 'zh-CN': '7. 设置 — 格式兼容' },
+  'detectTitle': { en: '8. Detect Format', 'zh-HK': '8. 偵測格式', 'zh-CN': '8. 检测格式' },
+  'packageTitle': { en: '9. Package Management (KJKv9)', 'zh-HK': '9. 套件管理 (KJKv9)', 'zh-CN': '9. 包管理 (KJKv9)' },
+  'shutdownTitle': { en: '10. Shutdown Server', 'zh-HK': '10. 關閉伺服器', 'zh-CN': '10. 关闭服务器' },
+  'headersTitle': { en: '11. Request Headers Reference', 'zh-HK': '11. 請求標頭參考', 'zh-CN': '11. 请求标头参考' },
+  'errorsTitle': { en: '12. Error Codes', 'zh-HK': '12. 錯誤碼', 'zh-CN': '12. 错误码' },
+  'fullTitle': { en: '13. Full Workflow Examples', 'zh-HK': '13. 完整工作流程範例', 'zh-CN': '13. 完整工作流程示例' },
+  // Version & compatibility
+  'navCompat': { en: 'Version & Compatibility', 'zh-HK': '版本與兼容', 'zh-CN': '版本与兼容' },
+  'verLatest': { en: 'v1.0.4 (latest)', 'zh-HK': 'v1.0.4（最新）', 'zh-CN': 'v1.0.4（最新）' },
+  'verPrev': { en: 'v1.0.3 (previous)', 'zh-HK': 'v1.0.3（上一版）', 'zh-CN': 'v1.0.3（上一版）' },
+  'verOld': { en: 'v1.0.1 (legacy)', 'zh-HK': 'v1.0.1（舊版）', 'zh-CN': 'v1.0.1（旧版）' },
+  'verHistoryTitle': { en: 'Version history', 'zh-HK': '版本歷史', 'zh-CN': '版本历史' },
+  'verEndpointMap': { en: 'Endpoint introduction map', 'zh-HK': '端點引入對照', 'zh-CN': '端点引入对照' },
+  'verColEndpoint': { en: 'Endpoint', 'zh-HK': '端點', 'zh-CN': '端点' },
+  'verColMethod': { en: 'Method', 'zh-HK': '方法', 'zh-CN': '方法' },
+  'verColSince': { en: 'Introduced', 'zh-HK': '引入版本', 'zh-CN': '引入版本' },
+  'verNotice': { en: 'Showing the v1.0.1 API view. Switch to <b>v1.0.4</b> to see every endpoint.', 'zh-HK': '目前顯示 v1.0.1 API 嘅檢視。切換到 <b>v1.0.4</b> 即可查看所有端點。', 'zh-CN': '当前显示 v1.0.1 API 视图。切换到 <b>v1.0.4</b> 可查看全部端点。' },
+
+  // Common labels
+  'reqHeaders': { en: 'Request Headers', 'zh-HK': '請求標頭', 'zh-CN': '请求标头' },
+  'reqRequired': { en: 'Required', 'zh-HK': '必填', 'zh-CN': '必填' },
+  'reqDesc': { en: 'Description', 'zh-HK': '說明', 'zh-CN': '说明' },
+  'required': { en: 'Required', 'zh-HK': '必填', 'zh-CN': '必填' },
+  'optional': { en: 'Optional', 'zh-HK': '可選', 'zh-CN': '可选' },
+  'queryParams': { en: 'Query Parameters', 'zh-HK': '查詢參數', 'zh-CN': '查询参数' },
+  'linuxExample': { en: 'Linux / macOS', 'zh-HK': 'Linux / macOS', 'zh-CN': 'Linux / macOS' },
+  'winExample': { en: 'Windows (PowerShell)', 'zh-HK': 'Windows (PowerShell)', 'zh-CN': 'Windows (PowerShell)' },
+  'response': { en: 'Response', 'zh-HK': '回應', 'zh-CN': '响应' },
+
+  // Status descriptions
+  'statusHdrDesc': {
+    en: 'Recommended but not strictly required for GET',
+    'zh-HK': '建議提供,但 GET 請求唔強制要求',
+    'zh-CN': '建议提供,但 GET 请求不强制要求',
+  },
+  'uaDesc': { en: 'Client identifier for logging', 'zh-HK': '客戶端識別碼,用於記錄', 'zh-CN': '客户端标识,用于记录' },
+
+  // Encrypt descriptions
+  'encHdrCtDesc': {
+    en: 'Determines how the body is parsed',
+    'zh-HK': '決定主體嘅解析方式',
+    'zh-CN': '决定请求体的解析方式',
+  },
+  'encPwdDesc': { en: 'Password for encryption (empty = no password)', 'zh-HK': '加密密碼 (留空 = 唔設密碼)', 'zh-CN': '加密密码 (留空 = 不设密码)' },
+  'encFnDesc': { en: 'Original filename (default: untitled)', 'zh-HK': '原始檔名 (預設: untitled)', 'zh-CN': '原始文件名 (默认: untitled)' },
+  'encExtDesc': { en: 'File extension (default: txt)', 'zh-HK': '檔案副檔名 (預設: txt)', 'zh-CN': '文件扩展名 (默认: txt)' },
+  'encFmtDesc': {
+    en: 'Response format: <code>json</code> or file download (default)',
+    'zh-HK': '回應格式:<code>json</code> 或檔案下載 (預設)',
+    'zh-CN': '响应格式:<code>json</code> 或文件下载 (默认)',
+  },
+  'encExample1': { en: 'Example 1: Binary Upload (Recommended for Files)', 'zh-HK': '範例 1:二進位上傳 (檔案推薦)', 'zh-CN': '示例 1:二进制上传 (文件推荐)' },
+  'encExample2': { en: 'Example 2: JSON Format (For Text)', 'zh-HK': '範例 2:JSON 格式 (文字用)', 'zh-CN': '示例 2:JSON 格式 (用于文本)' },
+
+  // Decrypt descriptions
+  'decHdrCtDesc': { en: 'Determines request parsing', 'zh-HK': '決定請求解析方式', 'zh-CN': '决定请求解析方式' },
+  'decPwdDesc': { en: 'Password (required if the .kjk file is encrypted)', 'zh-HK': '密碼 (如 .kjk 檔案已加密則必填)', 'zh-CN': '密码 (如 .kjk 文件已加密则必填)' },
+  'decFmtDesc': {
+    en: 'Response format: <code>json</code> (all files) or file download (first file)',
+    'zh-HK': '回應格式:<code>json</code> (所有檔案) 或檔案下載 (第一個檔案)',
+    'zh-CN': '响应格式:<code>json</code> (所有文件) 或文件下载 (第一个文件)',
+  },
+  'decExample1': { en: 'Example 1: Binary Upload (Decrypt File)', 'zh-HK': '範例 1:二進位上傳 (解密檔案)', 'zh-CN': '示例 1:二进制上传 (解密文件)' },
+  'decExample2': { en: 'Example 2: JSON Format (Get All Files)', 'zh-HK': '範例 2:JSON 格式 (取得所有檔案)', 'zh-CN': '示例 2:JSON 格式 (获取所有文件)' },
+
+  // Settings & detect descriptions
+  'setFmtDesc': {
+    en: 'POST only. One of <code>auto</code>, <code>KJKv7</code>, <code>KJKv5</code>. Omit to read the current value.',
+    'zh-HK': '僅限 POST。可選 <code>auto</code>、<code>KJKv7</code>、<code>KJKv5</code>。省略即讀取目前值。',
+    'zh-CN': '仅限 POST。可选 <code>auto</code>、<code>KJKv7</code>、<code>KJKv5</code>。省略即读取当前值。',
+  },
+  'detHdrCtDesc': {
+    en: 'Determines how the body is parsed',
+    'zh-HK': '決定主體嘅解析方式',
+    'zh-CN': '决定请求体的解析方式',
+  },
+
+  // Package management titles
+  'pkgOpenTitle': { en: '9.1 Open Package — <code>POST /package/open</code>', 'zh-HK': '9.1 開啟套件 — <code>POST /package/open</code>', 'zh-CN': '9.1 打开包 — <code>POST /package/open</code>' },
+  'pkgAppendTitle': { en: '9.2 Append Files — <code>POST /package/append</code>', 'zh-HK': '9.2 追加檔案 — <code>POST /package/append</code>', 'zh-CN': '9.2 追加文件 — <code>POST /package/append</code>' },
+  'pkgRenameTitle': { en: '9.3 Rename Entry — <code>POST /package/rename</code>', 'zh-HK': '9.3 重新命名條目 — <code>POST /package/rename</code>', 'zh-CN': '9.3 重命名条目 — <code>POST /package/rename</code>' },
+  'pkgDeleteTitle': { en: '9.4 Delete Entries — <code>POST /package/delete</code>', 'zh-HK': '9.4 刪除條目 — <code>POST /package/delete</code>', 'zh-CN': '9.4 删除条目 — <code>POST /package/delete</code>' },
+  'pkgPwdTitle': { en: '9.5 Change Password — <code>POST /package/change-password</code>', 'zh-HK': '9.5 修改密碼 — <code>POST /package/change-password</code>', 'zh-CN': '9.5 修改密码 — <code>POST /package/change-password</code>' },
+  'pkgVerifyTitle': { en: '9.6 Verify Package — <code>POST /package/verify</code>', 'zh-HK': '9.6 驗證套件 — <code>POST /package/verify</code>', 'zh-CN': '9.6 验证包 — <code>POST /package/verify</code>' },
+
+  // Headers reference
+  'hdrCtDesc': {
+    en: 'Determines how the server parses the request body. Use <code>application/octet-stream</code> for binary file uploads, <code>application/json</code> for JSON payloads.',
+    'zh-HK': '決定伺服器如何解析請求主體。二進位檔案上傳用 <code>application/octet-stream</code>,JSON 資料用 <code>application/json</code>。',
+    'zh-CN': '决定服务器如何解析请求体。二进制文件上传用 <code>application/octet-stream</code>,JSON 数据用 <code>application/json</code>。',
+  },
+  'hdrUaDesc': {
+    en: 'Identifies the client application. Useful for logging and debugging. Any string is accepted.',
+    'zh-HK': '識別客戶端應用程式。對記錄同除錯有用。任何字串都可以。',
+    'zh-CN': '标识客户端应用程序。用于记录和调试。接受任何字符串。',
+  },
+  'hdrAcceptDesc': {
+    en: 'Hint to the server about the desired response format. The <code>format</code> query parameter takes precedence.',
+    'zh-HK': '提示伺服器所需嘅回應格式。<code>format</code> 查詢參數優先級較高。',
+    'zh-CN': '提示服务器所需的响应格式。<code>format</code> 查询参数优先级更高。',
+  },
+  'hdrAuthDesc': {
+    en: 'Not used. Authentication is via the <code>password</code> query parameter or JSON body field.',
+    'zh-HK': '唔使用。認證透過 <code>password</code> 查詢參數或 JSON 主體欄位進行。',
+    'zh-CN': '不使用。认证通过 <code>password</code> 查询参数或 JSON 体字段进行。',
+  },
+
+  // Error codes
+  'errName': { en: 'Name', 'zh-HK': '名稱', 'zh-CN': '名称' },
+  'err200': { en: 'OK', 'zh-HK': '成功', 'zh-CN': '成功' },
+  'err200Desc': { en: 'Request successful', 'zh-HK': '請求成功', 'zh-CN': '请求成功' },
+  'err400': { en: 'Bad Request', 'zh-HK': '請求錯誤', 'zh-CN': '请求错误' },
+  'err400Desc': { en: 'Invalid input format or malformed request', 'zh-HK': '輸入格式無效或請求格式錯誤', 'zh-CN': '输入格式无效或请求格式错误' },
+  'err401': { en: 'Unauthorized', 'zh-HK': '未授權', 'zh-CN': '未授权' },
+  'err401Desc': { en: 'Password required or wrong password provided', 'zh-HK': '需要密碼或密碼錯誤', 'zh-CN': '需要密码或密码错误' },
+  'err404': { en: 'Not Found', 'zh-HK': '找不到', 'zh-CN': '未找到' },
+  'err404Desc': { en: 'No files found in the package', 'zh-HK': '套件中找不到檔案', 'zh-CN': '包中未找到文件' },
+  'err500': { en: 'Internal Error', 'zh-HK': '內部錯誤', 'zh-CN': '内部错误' },
+  'err500Desc': { en: 'Server-side processing error', 'zh-HK': '伺服器端處理錯誤', 'zh-CN': '服务器端处理错误' },
+  'errExample': { en: 'Error Response Example', 'zh-HK': '錯誤回應範例', 'zh-CN': '错误响应示例' },
+
+  // Full examples
+  'fullBashTitle': { en: 'Complete Bash Script (Linux / macOS)', 'zh-HK': '完整 Bash 腳本 (Linux / macOS)', 'zh-CN': '完整 Bash 脚本 (Linux / macOS)' },
+  'fullPwshTitle': { en: 'Complete PowerShell Script (Windows)', 'zh-HK': '完整 PowerShell 腳本 (Windows)', 'zh-CN': '完整 PowerShell 脚本 (Windows)' },
+  'fullPythonTitle': { en: 'Python Example', 'zh-HK': 'Python 範例', 'zh-CN': 'Python 示例' },
+};
+
+let currentLang = 'en';
+
+// 语言代码映射:sidebar.js 用 'zh-CN'/'en'/'zh-HK',本文档相同
+function normalizeLang(lang) {
+  if (!lang) return 'en';
+  if (lang.startsWith('zh-CN') || lang === 'zh') return 'zh-CN';
+  if (lang.startsWith('en')) return 'en';
+  if (lang.startsWith('zh-HK') || lang.startsWith('zh-TW')) return 'zh-HK';
+  return 'en';
+}
+
+function switchLang(lang) {
+  currentLang = lang;
+  // 更新 topbar 语言按钮高亮
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === lang || 
+      (lang === 'zh-HK' && btn.textContent.trim() === '繁體') ||
+      (lang === 'zh-CN' && btn.textContent.trim() === '简体'));
+  });
+  // 更新 data-lang 内容区块
+  document.querySelectorAll('[data-lang]').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('data-lang') === lang);
+  });
+  // 更新 data-i18n 元素
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const entry = I18N[key];
+    if (entry && entry[lang]) {
+      el.innerHTML = entry[lang];
+    }
+  });
+  // 更新版本选择器的选项文案
+  const verSel = document.getElementById('verSelect');
+  if (verSel) {
+    const labels = [I18N.verLatest, I18N.verPrev, I18N.verOld];
+    for (let i = 0; i < verSel.options.length && i < labels.length; i++) {
+      const lab = labels[i];
+      if (lab && lab[lang]) verSel.options[i].text = lab[lang];
+    }
+  }
+  // 同步到 sidebar.js 使用的 localStorage 键
+  try {
+    localStorage.setItem('kjk_api_docs_lang', lang);
+    localStorage.setItem('selectedLanguage', lang);
+  } catch (e) {}
+  document.documentElement.lang = lang;
+}
+
+let currentVersion = '1.0.4';
+const API_VERSIONS = ['1.0.1', '1.0.3', '1.0.4'];
+
+// 判断 ver 是否 >= since(语义化版本比较)
+function verGE(ver, since) {
+  const v = ver.split('.').map(Number);
+  const s = since.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((v[i] || 0) > (s[i] || 0)) return true;
+    if ((v[i] || 0) < (s[i] || 0)) return false;
+  }
+  return true;
+}
+
+// 按 API 版本过滤章节与侧边导航,并在章节标题注入版本徽标
+function applyVersion(v) {
+  currentVersion = v;
+  document.querySelectorAll('div.card[data-since]').forEach(function (card) {
+    const since = card.getAttribute('data-since') || '1.0.1';
+    card.classList.toggle('sec-hidden', !verGE(v, since));
+  });
+  // 注入章节版本徽标(仅一次;版本说明章节本身不注入)
+  const verSel = document.getElementById('verSelect');
+  if (verSel && !verSel.dataset.badged) {
+    document.querySelectorAll('div.card[data-since]').forEach(function (card) {
+      if (card.id === 'compat') return;
+      const h2 = card.querySelector('h2');
+      if (!h2) return;
+      const since = card.getAttribute('data-since') || '1.0.1';
+      const badge = document.createElement('span');
+      badge.className = 'ver-badge';
+      badge.textContent = 'v' + since;
+      h2.appendChild(badge);
+    });
+    verSel.dataset.badged = '1';
+  }
+  // 隐藏对应被隐藏章节的导航链接
+  document.querySelectorAll('.nav a').forEach(function (a) {
+    const href = (a.getAttribute('href') || '').replace(/^#/, '');
+    if (!href) return;
+    const target = document.getElementById(href);
+    a.classList.toggle('sec-hidden', !target || target.classList.contains('sec-hidden'));
+  });
+  // 版本提示条:非最新版本时显示
+  const notice = document.getElementById('verNotice');
+  if (notice) notice.classList.toggle('show', v !== '1.0.4');
+  try { localStorage.setItem('kjk_api_docs_version', v); } catch (e) {}
+}
+
+function switchVersion(v) {
+  applyVersion(v);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  const themeBtn = document.getElementById('themeBtn');
+  const icon = themeBtn.querySelector('i');
+  icon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  try { localStorage.setItem('kjk_api_docs_theme', next); } catch (e) {}
+}
+
+// sidebar.js 语言切换钩子:sidebar.js 切换语言后会调用此函数,然后 reload
+window.onLanguageChange = function(lang) {
+  switchLang(normalizeLang(lang));
+};
+
+// Init
+(function init() {
+  // 优先读取 sidebar.js 的 selectedLanguage,回退到本文档自己的键
+  let savedLang = 'en';
+  try {
+    savedLang = normalizeLang(
+      localStorage.getItem('selectedLanguage') ||
+      localStorage.getItem('kjk_api_docs_lang') ||
+      'en'
+    );
+  } catch (e) {}
+  switchLang(savedLang);
+
+  // 恢复 API 版本选择
+  let savedVer = '1.0.4';
+  try { savedVer = localStorage.getItem('kjk_api_docs_version') || '1.0.4'; } catch (e) {}
+  const verEl = document.getElementById('verSelect');
+  if (verEl) verEl.value = API_VERSIONS.indexOf(savedVer) !== -1 ? savedVer : '1.0.4';
+  applyVersion(verEl ? verEl.value : '1.0.4');
+
+  // 恢复主题
+  let savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('kjk_api_docs_theme') || 'light'; } catch (e) {}
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const initThemeBtn = document.getElementById('themeBtn');
+  const initIcon = initThemeBtn.querySelector('i');
+  initIcon.className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+
+  // ===== 移动端 sidebar 适配 =====
+  initMobileSidebar();
+})();
+
+// ===== 移动端 sidebar 抽屉式适配 =====
+function initMobileSidebar() {
+  const MOBILE_BREAKPOINT = 768;
+  let overlay = null;
+  let observer = null;
+  let initialized = false;
+
+  function isMobile() {
+    return window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches;
+  }
+
+  // 创建遮罩层
+  function ensureOverlay() {
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'dnt-mobile-overlay';
+      overlay.addEventListener('click', function() {
+        if (window._dntToggleCollapse) window._dntToggleCollapse();
+      });
+      document.body.appendChild(overlay);
+    }
+    return overlay;
+  }
+
+  // 根据 sidebar 状态更新遮罩
+  function updateOverlay() {
+    if (!isMobile()) {
+      if (overlay) overlay.classList.remove('show');
+      return;
+    }
+    const sidebar = document.getElementById('dnt-sidebar');
+    if (!sidebar) return;
+    ensureOverlay();
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    if (isCollapsed) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  // 监听 sidebar 的 class 变化
+  function observeSidebar(sidebar) {
+    if (observer) observer.disconnect();
+    observer = new MutationObserver(function() {
+      updateOverlay();
+    });
+    observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // 移动端初始化:自动折叠 sidebar
+  function setupMobile() {
+    const sidebar = document.getElementById('dnt-sidebar');
+    if (!sidebar) return false;
+
+    if (!initialized) {
+      initialized = true;
+      observeSidebar(sidebar);
+    }
+
+    if (isMobile()) {
+      // 移动端:默认折叠
+      if (!sidebar.classList.contains('collapsed')) {
+        if (window._dntToggleCollapse) window._dntToggleCollapse();
+      }
+    } else {
+      // 桌面端:默认展开(如果之前被折叠)
+      const expandBtn = document.getElementById('dnt-expand-btn');
+      if (sidebar.classList.contains('collapsed') && expandBtn && expandBtn.style.display === 'flex') {
+        // 只在移动端切桌面端时自动展开
+      }
+    }
+    updateOverlay();
+    return true;
+  }
+
+  // 等 sidebar.js 加载完成(它会创建 #dnt-sidebar 和 #dnt-expand-btn)
+  function waitForSidebar() {
+    const check = function() {
+      return document.getElementById('dnt-sidebar') &&
+             document.getElementById('dnt-expand-btn') &&
+             typeof window._dntToggleCollapse === 'function';
+    };
+    if (check()) { setupMobile(); return; }
+    // 用 MutationObserver 监听 body 子节点变化
+    const bodyObserver = new MutationObserver(function() {
+      if (check()) {
+        bodyObserver.disconnect();
+        // 延迟一帧,确保 sidebar.js 完全执行完
+        requestAnimationFrame(setupMobile);
+      }
+    });
+    bodyObserver.observe(document.body, { childList: true, subtree: false });
+    // 超时保护(5秒)
+    setTimeout(function() { bodyObserver.disconnect(); }, 5000);
+  }
+
+  // 监听窗口大小变化
+  let resizeTimer = null;
+  window.addEventListener('resize', function() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      setupMobile();
+    }, 200);
+  });
+
+  // 启动
+  waitForSidebar();
+}
+</script>
+
+<!-- 从服务器加载 sidebar.js,提供左侧现代化侧边栏(品牌/导航/语言切换/UI模式) -->
+<script src="/sidebar.js"></script>
+</body>
+</html>

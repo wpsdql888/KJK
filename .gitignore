@@ -1,0 +1,19 @@
+# ===== 打包/发布产物（用户会手动上传 GitHub 进行 Release）=====
+KJK-Encryptor-*.zip
+dist/
+python/build/
+python/*.spec
+python/engine/*.dll
+
+# ===== Python 缓存 =====
+__pycache__/
+*.py[cod]
+
+# ===== 本机运行配置（含本地偏好，不下发）=====
+python/kjk_config.json
+
+# ===== 编辑器 / 系统 =====
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

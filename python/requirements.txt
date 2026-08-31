@@ -1,0 +1,18 @@
+# KJK Encryptor - Python Dependencies
+# Core functionality requires no extra dependencies (stdlib only)
+# Below are optional dependencies
+
+# argon2-cffi - Argon2id password hashing (KJKv5, recommended)
+argon2-cffi>=21.3
+
+# numpy - 向量化 token 编解码,大文件加解密速度提升数倍 (强烈推荐)
+numpy>=1.24
+
+# Flask - API server (optional)
+flask>=2.0
+
+# Pillow - Image preview (optional)
+Pillow>=9.0
+
+# requests - API client (optional)
+requests>=2.25
