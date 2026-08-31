@@ -203,7 +203,7 @@ A：请确认已安装并注册了 v1.0.4（v1.0.4 修复了部分 Windows 11 �
 
 ## 十一、许可证
 
-本项目采用 **MIT License** 开源，详见 [`python/LICENSE`](python/LICENSE)。
+本项目采用 **MIT License** 开源，详见 [`LICENSE`](LICENSE)。
 
 - 允许个人、教育、研究及商业用途。
 - 分发或修改时须保留版权声明与本许可声明。
