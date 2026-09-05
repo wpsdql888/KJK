@@ -149,7 +149,7 @@ except Exception as e:
     sys.exit(1)
 
 # PyInstaller 命令 (onedir 多目录结构: 启动无需解压, engine/ 插件目录用户可见)
-APP_VERSION = '1.0.4'
+APP_VERSION = '1.1.0'
 cmd = [
     'pyinstaller',
     f'--name={APP_NAME}',

@@ -1233,11 +1233,33 @@ class BrowseTree:
         self._schedule()
 
     def _bind_wheel(self, w):
-        def _wheel(e):
-            self.canvas.yview_scroll(int(-e.delta / 120), 'units')
+        # 行是 Canvas.create_window 内嵌的 Frame, 焦点常落在行控件而非 canvas 上,
+        # Windows 的 <MouseWheel> 发给焦点控件, 单绑 canvas 会失灵。
+        # 改为进程级 bind_all + 指针落在画布可视区内才滚动。
+        def _wheel(e, units):
+            self.canvas.yview_scroll(units, 'units')
             self._schedule()
-        w.bind('<MouseWheel>', _wheel, add='+')
+
+        def _target(e):
+            try:
+                x0 = self.canvas.winfo_rootx(); y0 = self.canvas.winfo_rooty()
+                ww = self.canvas.winfo_width(); wh = self.canvas.winfo_height()
+                return x0 <= e.x_root <= x0 + ww and y0 <= e.y_root <= y0 + wh
+            except Exception:
+                return False
+
+        def _global_wheel(e):
+            if not _target(e):
+                return
+            if e.delta:
+                _wheel(e, int(-e.delta / 120))
+            # 返回 'break' 防止冒泡重复滚动
+            return 'break'
+
+        w.bind('<MouseWheel>', lambda e: _global_wheel(e), add='+')
         w.bind('<Enter>', lambda e: w.focus_set(), add='+')
+        top = w.winfo_toplevel()
+        top.bind_all('<MouseWheel>', lambda e: _global_wheel(e), add='+')
 
     # ---- 交互 ----
 

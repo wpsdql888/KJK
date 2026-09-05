@@ -1,11 +1,42 @@
 # KJK Encryptor — 更新日志 (Changelog)
 
 所有值得注意的改动都会记录在此文件。遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 规范，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
-本文件以 **上一正式版 v1.0.3** 为基线，列出 v1.0.4 相对 v1.0.3 的净差异。
+本文件以 **上一正式版 v1.0.3** 为基线，列出 v1.0.4 相对 v1.0.3 的净差异；并追加 **v1.1.0 相对 v1.0.4** 的新增 / 修改 / 修复。
 
 ## 格式说明
 
 - `[+]` = 新增 · `[~]` = 修改/重构 · `[x]` = 移除 · `[*]` = 修复
+
+---
+
+## [v1.1.0] - 2026-09-05
+
+### 新增 (Added)
+
+#### 桌面版主程序 (`main.py`) — 加密算法可选
+- `[+]` 加密页新增**加密算法下拉选择**：`KJKv9（二进制 .kjk 文件）` / `旧版本文本（可复制密文）`。
+- `[+]` 新增 i18n 键：`encryptAlgorithm`、`algKjk9`、`algText`、`msgKjk9Saved`（三语）。
+- `[+]` 选择 KJKv9 时走 `kjk9.encrypt_paths_to_kjk9()` 强制写盘为 `.kjk`；结果区仅提示"已保存到…"，不复制二进制。
+
+#### 网页版 (`index.html`) — 加密算法可选
+- `[+]` 加密页顶部新增加密算法下拉 `<select id="encryptAlgSelect">`，可选 `KJKv9` / `legacy`。
+- `[+]` 新增 JS 状态 `encryptAlg` + `setEncryptAlg()` / `loadEncryptAlg()`（选择持久化到 `localStorage`）、`setEncryptCopyVisible()`（KJKv9 隐藏复制按钮）。
+- `[+]` 新增 i18n 键：`encryptAlgorithm`、`algKjk9`、`algLegacy`、`kjk9Done`（三语）。
+
+### 修改 (Changed)
+
+#### 桌面版 (`main.py`)
+- `[~]` `_encrypt()` / `_encrypt_worker()`：以 `use_kjk9 = encrypt_alg_var.get() == algKjk9` 分支 —— KJKv9 强制选保存位置并写盘、旧算法纯文本走内存 `encrypt()` 输出可复制密文、旧算法文件仍用 `pack_kjk_with_paths[_to_file]`。
+- `[~]` `_on_encrypt_done_file()`：KJKv9 时结果区只显示 `msgKjk9Saved`（保存路径提示），不再尝试当文本读取。
+
+#### 网页版 (`index.html`)
+- `[~]` `doEncrypt()`：以 `encryptAlg === 'KJKv9'` 驱动 `useV9`（取代旧的 `formatCompat` 分支）；纯文本并入任务列表，KJKv9 打包为单个 `.kjk`、旧算法输出可复制密文；结果渲染改为：KJKv9 → 显示 `kjk9Done` 提示 + **自动触发下载** + 隐藏复制按钮；旧算法 → 显示密文（前 300 字）+ 显示复制按钮。
+
+### 修复 (Fixes)
+
+- `[*]` **网页版旧算法加密较大文件报 substring 错误**：`compressCiphertext()` 原用 `btoa(String.fromCharCode(...compressed))`，数据稍大（约 60KB+ 不可压缩数据）即超出参数上限触发 `RangeError`；`doEncrypt` 中 KJKv9 结果又去读不存在的 `encryptResultData.content`，二次触发 `Cannot read properties of undefined (reading 'substring')`。改为**分块拼接**（`subarray` + 循环 `String.fromCharCode`，块长 0x8000）后再 `btoa`，并对结果渲染加了 `encryptResultData` 判空与 `|| ''` 兜底。
+- `[*]` **桌面版纯文本解密输出多余包络**：`_render_results_text()` 在只有**单个纯文本条目**时直接解码 `utf-8` 输出明文，去除 `── 名称 (大小 B) ──` 等包络信息；解密结果为**文件 / 包**时才进入包管理器目录树。
+- `[*]` **桌面版包管理器滚轮失效**：`browse.py _bind_wheel()` 原只绑 canvas 的 `<MouseWheel>`，焦点落在行内控件时捕获不到。改为进程级 `top.bind_all('<MouseWheel>')` + 指针落点在 canvas 可视区内（`x_root/y_root` 范围判断）才滚动，返回 `'break'` 防冒泡。`main.py` 与 `browse.py` 均 `py_compile` 通过。
 
 ---
 

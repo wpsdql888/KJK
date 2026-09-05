@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""KJK Encryptor - 主程序 (Tkinter GUI) v1.0.4"""
+"""KJK Encryptor - 主程序 (Tkinter GUI) v1.1.0"""
 
 import os
 import sys
@@ -28,7 +28,7 @@ except Exception:
     DND_FILES = ''
     _HAS_DND = False
 
-CURRENT_VERSION = '1.0.4'
+CURRENT_VERSION = '1.1.0'
 
 SERVER_URL_PRIMARY = 'https://dnteam.top/'
 SERVER_URL_BACKUP = 'https://www.917813.help/'
@@ -645,6 +645,10 @@ class KJKApp:
             'filesCount': {'en': '{} files', 'zh-HK': '{} 個檔案', 'zh-CN': '{} 个文件'},
             'passwordOptional': {'en': 'Password (optional):', 'zh-HK': '密碼 Password (可選):', 'zh-CN': '密码 (可选):'},
             'mergeIntoOnePackage': {'en': 'Merge into one package', 'zh-HK': '合併為單一 package', 'zh-CN': '合并为一个包'},
+            'encryptAlgorithm': {'en': 'Algorithm:', 'zh-HK': '演算法:', 'zh-CN': '加密算法:'},
+            'algKjk9': {'en': 'KJKv9 (binary, save as .kjk file)', 'zh-HK': 'KJKv9 (二進制, 只可儲存 .kjk 檔案)', 'zh-CN': 'KJKv9（二进制，仅保存 .kjk 文件）'},
+            'algText': {'en': 'Legacy text (copyable ciphertext)', 'zh-HK': '舊版文字 (可複製密文)', 'zh-CN': '旧版本文本（可复制密文）'},
+            'msgKjk9Saved': {'en': 'KJKv9 is a binary format and cannot be pasted as text. It has been saved to:\n{}', 'zh-HK': 'KJKv9 係二進制格式, 唔可以貼做文字。已儲存到:\n{}', 'zh-CN': 'KJKv9 为二进制格式，无法粘贴为文本。已保存到：\n{}'},
             'btnEncrypt': {'en': '🔐 Encrypt', 'zh-HK': '🔐 Encrypt', 'zh-CN': '🔐 加密'},
             'btnDecrypt': {'en': '🔓 Decrypt', 'zh-HK': '🔓 Decrypt', 'zh-CN': '🔓 解密'},
             'btnDownloadKjk': {'en': '⬇ Download .kjk', 'zh-HK': '⬇ Download .kjk', 'zh-CN': '⬇ 下载 .kjk'},
@@ -986,7 +990,7 @@ class KJKApp:
                                      bg=c['card'], fg=c['fg'],
                                      font=(self._font_name(), 12, 'bold'), anchor='w')
         self.header_title.pack(side=tk.LEFT, padx=10, pady=5)
-        self.header_sub = tk.Label(self.header_bar, text='v1.0.4',
+        self.header_sub = tk.Label(self.header_bar, text='v1.1.0',
                                    bg=c['card'], fg=c['text_secondary'],
                                    font=(self._font_name(), 9), anchor='w')
         self.header_sub.pack(side=tk.LEFT, pady=5)
@@ -1158,6 +1162,17 @@ class KJKApp:
                                            bg=c['bg'], fg=c['fg'], selectcolor=c['card'],
                                            font=(self._font_name(), 10))
         self.merge_check.pack(anchor='w', pady=(4, 0))
+
+        # 加密算法选择 (KJKv9 二进制 vs 旧版本文本可复制)
+        alg_frame = tk.Frame(f, bg=c['bg'])
+        alg_frame.pack(fill=tk.X, pady=(6, 0))
+        tk.Label(alg_frame, text=self._t('encryptAlgorithm'), bg=c['bg'], fg=c['fg'],
+                 font=(self._font_name(), 10)).pack(side=tk.LEFT, padx=(0, 8))
+        self.encrypt_alg_var = tk.StringVar(value=self._t('algKjk9'))
+        self.encrypt_alg = ttk.Combobox(alg_frame, state='readonly', textvariable=self.encrypt_alg_var,
+                                        values=[self._t('algKjk9'), self._t('algText')], width=30,
+                                        font=(self._font_name(), 10))
+        self.encrypt_alg.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
         # Password + action buttons
         action_frame = tk.Frame(f, bg=c['bg'])
@@ -1513,11 +1528,13 @@ class KJKApp:
         self.encrypt_pb_label.config(text=self._t('progressPreparing'))
 
         is_text_only = bool(text) and not self.encrypt_files and not self.encrypt_folders
+        # 加密算法: KJKv9 为二进制, 只能保存 .kjk 文件; 旧版本文本才可输出可复制密文
+        use_kjk9 = self.encrypt_alg_var.get() == self._t('algKjk9')
         self._text_temp_path = None
 
-        # 文件/文件夹加密: 先选保存位置, worker 里流式直写磁盘, 大包不再驻留内存
+        # KJKv9(二进制)或文件/文件夹: 必须先选保存位置; 仅旧算法纯文本走内存可复制
         save_path = None
-        if not is_text_only:
+        if (not is_text_only) or use_kjk9:
             save_path = filedialog.asksaveasfilename(
                 title=self._t('dialogTitleSaveKjk'),
                 defaultextension='.kjk',
@@ -1530,7 +1547,8 @@ class KJKApp:
         def _encrypt_worker():
             _set_worker_thread_priority()
 
-            if is_text_only:
+            # 旧版本文本 + 纯文本: 内存加密, 输出可复制密文
+            if is_text_only and not use_kjk9:
                 try:
                     def on_progress(p):
                         self.root.after(0, lambda: self._update_encrypt_progress(p * 100, self._t('statusEncrypting').format(1, 1)))
@@ -1556,19 +1574,33 @@ class KJKApp:
                 paths.append(tmp_path)
                 self._text_temp_path = tmp_path
 
-            fn_file = _OPTIONAL_ENGINE.get('pack_kjk_with_paths_to_file')
-            fn_mem = _OPTIONAL_ENGINE.get('pack_kjk_with_paths')
-            if fn_file is None and fn_mem is None:
-                self.root.after(0, lambda: _missing_engine_msgbox('pack_kjk_with_paths', parent=self.root))
-                self.root.after(0, lambda: self.encrypt_btn.config(state='normal', text=self._t('btnEncrypt')))
-                return
+            file_count = len(self.encrypt_files) + len(self.encrypt_folders) + (1 if text else 0)
 
             def on_progress(current, total):
                 pct = (current / max(total, 1)) * 100
                 self.root.after(0, lambda: self._update_encrypt_progress(pct, self._t('progressEncrypting')))
 
+            def on_kjk9_progress(frac, label=''):
+                self.root.after(0, lambda: self._update_encrypt_progress(frac * 100, label or self._t('progressEncrypting')))
+
             try:
-                file_count = len(self.encrypt_files) + len(self.encrypt_folders) + (1 if text else 0)
+                if use_kjk9:
+                    # KJKv9 二进制: 强制写入 .kjk 文件, 不输出文本密文
+                    import kjk9
+                    kjk9.encrypt_paths_to_kjk9(paths, save_path, password, progress=on_kjk9_progress)
+                    self.encrypt_result = {'path': save_path, 'type': 'kjk9',
+                                           'files': [{'size': 0} for _ in range(file_count)]}
+                    self.root.after(0, self._on_encrypt_done_file, save_path, file_count)
+                    return
+
+                # 旧版本文本: 文件/文件夹打包为文本 .kjk
+                fn_file = _OPTIONAL_ENGINE.get('pack_kjk_with_paths_to_file')
+                fn_mem = _OPTIONAL_ENGINE.get('pack_kjk_with_paths')
+                if fn_file is None and fn_mem is None:
+                    self.root.after(0, lambda: _missing_engine_msgbox('pack_kjk_with_paths', parent=self.root))
+                    self.root.after(0, lambda: self.encrypt_btn.config(state='normal', text=self._t('btnEncrypt')))
+                    return
+
                 if fn_file is not None and save_path:
                     # 流式直写: 大包不进内存
                     fn_file(paths, save_path, password, progress_callback=on_progress)
@@ -1625,16 +1657,20 @@ class KJKApp:
         self.set_status(self._t('statusEncryptComplete').format(1))
 
     def _on_encrypt_done_file(self, path, file_count):
-        """流式打包完成: .kjk 已直接写入磁盘。"""
+        """流式打包完成: .kjk 已直接写入磁盘。KJKv9 为二进制, 只显示保存提示。"""
         self.encrypt_btn.config(state='normal', text=self._t('btnEncrypt'))
         self.encrypt_pb['value'] = 100
         self.encrypt_pb_label.config(text=self._t('progressComplete'))
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                head = f.read(1000)
-        except OSError:
-            head = path
-        self._set_encrypt_result(head)
+        is_kjk9 = bool(self.encrypt_result) and self.encrypt_result.get('type') == 'kjk9'
+        if is_kjk9:
+            self._set_encrypt_result(self._t('msgKjk9Saved').format(os.path.basename(path), path))
+        else:
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    head = f.read(1000)
+                self._set_encrypt_result(head)
+            except OSError:
+                self._set_encrypt_result(path)
         self.set_status(self._t('statusSaved').format(os.path.basename(path)))
 
     def _download_kjk(self):
@@ -2036,10 +2072,22 @@ class KJKApp:
             widget.insert('1.0', self._t('noDecryptResults'))
             widget.see('1.0')
             return
+        # 单个纯文本条目: 仅输出文本本身, 不带 '── 名称 (大小) ──' 包络
+        entries = [it for it in results
+                   if not it.get('_is_password_header') and not it.get('_is_password_prefix_header')]
+        if len(entries) == 1:
+            data = entries[0].get('data')
+            if data is not None:
+                try:
+                    plain = data.decode('utf-8')
+                except (UnicodeDecodeError, AttributeError):
+                    plain = None
+                if plain is not None:
+                    widget.insert('1.0', plain)
+                    widget.see('1.0')
+                    return
         blocks = []
-        for item in results:
-            if item.get('_is_password_header') or item.get('_is_password_prefix_header'):
-                continue
+        for item in entries:
             name = item.get('originalName', item.get('name', self._t('unknownFile')))
             data = item.get('data')
             size = len(data) if data is not None else item.get('size', 0)

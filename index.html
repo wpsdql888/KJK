@@ -462,6 +462,13 @@ select{font-family:var(--font-sans);cursor:pointer;appearance:none;background-im
         </label>
       </div>
       <div class="form-group">
+        <label class="form-label" data-i18n="encryptAlgorithm">Encryption Algorithm</label>
+        <select id="encryptAlgSelect" onchange="setEncryptAlg(this.value)" style="width:100%;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text)">
+          <option value="KJKv9" data-i18n="algKjk9">KJKv9 (binary .kjk file)</option>
+          <option value="legacy" data-i18n="algLegacy">Legacy text (copyable ciphertext)</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label" data-i18n="passwordLabel">Password (optional)</label>
         <div style="position:relative">
           <input type="password" id="encryptPassword" placeholder="" data-i18n-placeholder="passwordPlaceholder"
@@ -485,7 +492,7 @@ select{font-family:var(--font-sans);cursor:pointer;appearance:none;background-im
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span data-i18n="downloadKjk">Download .kjk</span>
         </button>
-        <button class="btn" onclick="copyResult()">
+        <button class="btn" id="encryptCopyBtn" onclick="copyResult()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           <span data-i18n="copy">Copy</span>
         </button>
@@ -807,6 +814,10 @@ const i18n = {
     legacyNotice: 'Legacy-format package (KJKv7/KJKv5). Re-encrypt as KJKv9 for best compatibility & performance.',
     formatCompat: 'Format Compatibility',
     formatAuto: 'Auto (detect automatically)',
+    encryptAlgorithm: 'Encryption Algorithm',
+    algKjk9: 'KJKv9 (binary .kjk file)',
+    algLegacy: 'Legacy text (copyable ciphertext)',
+    kjk9Done: 'KJKv9 is a binary format and cannot be copied as text; the .kjk file has been downloaded.',
     formatV9: 'KJKv9 (v1.0.4 C engine binary)',
     formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
     formatV5: 'KJKv5 (v1.0.2 SHA-256)',
@@ -926,6 +937,10 @@ const i18n = {
     legacyNotice: '此為舊版格式套件 (KJKv7/KJKv5)。建議重新加密為 KJKv9 以獲得最佳兼容性及效能。',
     formatCompat: '格式兼容性',
     formatAuto: '自動 (自動檢測)',
+    encryptAlgorithm: '加密演算法',
+    algKjk9: 'KJKv9 (二進制 .kjk 檔案)',
+    algLegacy: '舊版文字 (可複製密文)',
+    kjk9Done: 'KJKv9 係二進制格式唔可以複製做文字, 已下載 .kjk 檔案。',
     formatV9: 'KJKv9 (v1.0.4 C 引擎二進制)',
     formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
     formatV5: 'KJKv5 (v1.0.2 SHA-256)',
@@ -1045,6 +1060,10 @@ const i18n = {
     legacyNotice: '这是旧版格式包 (KJKv7/KJKv5)。建议重新加密为 KJKv9 以获得最佳兼容性和性能。',
     formatCompat: '格式兼容性',
     formatAuto: '自动 (自动检测)',
+    encryptAlgorithm: '加密算法',
+    algKjk9: 'KJKv9（二进制 .kjk 文件）',
+    algLegacy: '旧版文本（可复制密文）',
+    kjk9Done: 'KJKv9 为二进制格式，无法复制为文本，已自动下载 .kjk 文件。',
     formatV9: 'KJKv9 (v1.0.4 C 引擎二进制)',
     formatV7: 'KJKv7 (v1.0.3 AES-256-GCM)',
     formatV5: 'KJKv5 (v1.0.2 SHA-256)',
@@ -1053,7 +1072,7 @@ const i18n = {
 };
 
 // ======================== Update Constants ========================
-const CURRENT_VERSION = '1.0.4';
+const CURRENT_VERSION = '1.1.0';
 const SERVER_URL_PRIMARY = 'https://dnteam.top/';
 const SERVER_URL_BACKUP = 'https://www.917813.help/';
 const DOWNLOAD_URL_PRIMARY = 'https://dnteam.top/KJK/KJKinstaller.exe';
@@ -1071,6 +1090,7 @@ let encryptFiles = [];
 let encryptResultData = null;
 let encryptPackages = [];
 let formatCompat = 'auto';
+let encryptAlg = 'KJKv9'; // 加密页算法选择: 'KJKv9'(二进制, 强制下载) / 'legacy'(旧版文本, 可复制)
 
 // Decrypt state
 let decryptFiles = [];
@@ -1524,7 +1544,13 @@ async function compressCiphertext(text) {
   const compressed = new Uint8Array(chunks.reduce((a, b) => a + b.length, 0));
   let offset = 0;
   for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
-  return btoa(String.fromCharCode(...compressed));
+  // 分块拼接,避免 String.fromCharCode(...大数组) 超过参数上限(RangeError)
+  let bin = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < compressed.length; i += CHUNK) {
+    bin += String.fromCharCode.apply(null, compressed.subarray(i, i + CHUNK));
+  }
+  return btoa(bin);
 }
 
 async function decompressCiphertext(b64data) {
@@ -2176,77 +2202,78 @@ async function doEncrypt() {
       sharedSalt = saltFromHex(parsed.saltHex);
     }
 
-    // 纯文本模式
-    if (encryptFiles.length === 0 && textInput) {
+    // 加密算法决定输出: KJKv9 为二进制, 只能保存为 .kjk(强制下载); 旧版本文本可复制
+    const useV9 = encryptAlg === 'KJKv9';
+    const isTextOnly = encryptFiles.length === 0 && !!textInput;
+
+    // 构建任务列表(含纯文本任务)
+    const baseTasks = [];
+    if (textInput) {
+      baseTasks.push({ data: new TextEncoder().encode(textInput), name: 'untitled', ext: 'txt', path: 'untitled.txt' });
+    }
+    for (const item of encryptFiles) {
+      const path = item.path || item.file.name;
+      if (path.endsWith('/')) {
+        baseTasks.push({ data: new Uint8Array(0), name: path, ext: '', isDir: true, path });
+        continue;
+      }
+      const lastSlash = path.lastIndexOf('/');
+      const lastDot = path.lastIndexOf('.');
+      const hasExt = lastDot > lastSlash && lastDot > 0;
+      const ext = hasExt ? path.slice(lastDot + 1) : '';
+      const name = hasExt ? path.slice(0, lastDot) : path;
+      // 大文件不预载入内存,由 buildPackageFromTasks 分块读取加密
+      const data = (item.file && item.file.size > PART_PLAINTEXT_SIZE) ? null : await readFileAsBytes(item.file);
+      baseTasks.push({ file: item.file, data, name, ext, path });
+    }
+
+    if (isTextOnly && !useV9) {
+      // 纯文本 + 旧版本文本: 输出紧凑且可复制的密文
       const textBytes = new TextEncoder().encode(textInput);
       const outputContent = await encrypt(textBytes, password);
       encryptResultData = { content: outputContent, type: 'text' };
       encryptPackages = [];
+    } else if (merge || baseTasks.length <= 1) {
+      if (useV9) {
+        const pkg = await buildPackageV9(baseTasks, password, frac => {
+          progressFill.style.width = (frac * 100) + '%';
+        });
+        encryptResultData = { blob: pkg.blob, type: 'kjk9', name: 'encrypted.kjk', hasPwd: pkg.hasPwd };
+        encryptPackages = [];
+      } else {
+        const outputContent = await buildPackageFromTasks(baseTasks, password, sharedSalt, hasPwd);
+        encryptResultData = { content: outputContent, type: 'kjk' };
+        encryptPackages = [];
+      }
     } else {
-      // 构建任务列表
-      const useV9 = formatCompat === 'KJKv9' || formatCompat === 'auto';
-      const baseTasks = [];
-      if (textInput) {
-        baseTasks.push({ data: new TextEncoder().encode(textInput), name: 'untitled', ext: 'txt', path: 'untitled.txt' });
-      }
-      for (const item of encryptFiles) {
-        const path = item.path || item.file.name;
-        if (path.endsWith('/')) {
-          baseTasks.push({ data: new Uint8Array(0), name: path, ext: '', isDir: true, path });
-          continue;
-        }
-        const lastSlash = path.lastIndexOf('/');
-        const lastDot = path.lastIndexOf('.');
-        const hasExt = lastDot > lastSlash && lastDot > 0;
-        const ext = hasExt ? path.slice(lastDot + 1) : '';
-        const name = hasExt ? path.slice(0, lastDot) : path;
-        // 大文件不预载入内存,由 buildPackageFromTasks 分块读取加密
-        const data = (item.file && item.file.size > PART_PLAINTEXT_SIZE) ? null : await readFileAsBytes(item.file);
-        baseTasks.push({ file: item.file, data, name, ext, path });
-      }
-
-      if (merge || baseTasks.length <= 1) {
+      // 分组打包
+      const groups = buildEncryptGroups();
+      encryptPackages = [];
+      let idx = 0;
+      for (const [key, items] of Object.entries(groups)) {
+        const tasks = items.map(item => {
+          const base = baseTasks.find(t => t.file === item.file);
+          if (base) return base;
+          const path = item.path || item.file.name;
+          if (path.endsWith('/')) return { data: new Uint8Array(0), name: path, ext: '', isDir: true, path };
+          const lastSlash = path.lastIndexOf('/');
+          const lastDot = path.lastIndexOf('.');
+          const hasExt = lastDot > lastSlash && lastDot > 0;
+          const ext = hasExt ? path.slice(lastDot + 1) : '';
+          const name = hasExt ? path.slice(0, lastDot) : path;
+          return { file: item.file, data: null, name, ext, path };
+        }).filter(Boolean);
         if (useV9) {
-          const pkg = await buildPackageV9(baseTasks, password, frac => {
+          const pkg = await buildPackageV9(tasks, password, frac => {
             progressFill.style.width = (frac * 100) + '%';
           });
-          encryptResultData = { blob: pkg.blob, type: 'kjk9', name: 'encrypted.kjk', hasPwd: pkg.hasPwd };
-          encryptPackages = [];
+          encryptPackages.push({ name: key + '.kjk', blob: pkg.blob, idx: idx++, hasPwd: pkg.hasPwd });
         } else {
-          const outputContent = await buildPackageFromTasks(baseTasks, password, sharedSalt, hasPwd);
-          encryptResultData = { content: outputContent, type: 'kjk' };
-          encryptPackages = [];
+          const content = await buildPackageFromTasks(tasks, password, sharedSalt, hasPwd);
+          encryptPackages.push({ name: key + '.kjk', content, idx: idx++ });
         }
-      } else {
-        // 分组打包
-        const groups = buildEncryptGroups();
-        encryptPackages = [];
-        let idx = 0;
-        for (const [key, items] of Object.entries(groups)) {
-          const tasks = items.map(item => {
-            const base = baseTasks.find(t => t.file === item.file);
-            if (base) return base;
-            const path = item.path || item.file.name;
-            if (path.endsWith('/')) return { data: new Uint8Array(0), name: path, ext: '', isDir: true, path };
-            const lastSlash = path.lastIndexOf('/');
-            const lastDot = path.lastIndexOf('.');
-            const hasExt = lastDot > lastSlash && lastDot > 0;
-            const ext = hasExt ? path.slice(lastDot + 1) : '';
-            const name = hasExt ? path.slice(0, lastDot) : path;
-            return { file: item.file, data: null, name, ext, path };
-          }).filter(Boolean);
-          if (useV9) {
-            const pkg = await buildPackageV9(tasks, password, frac => {
-              progressFill.style.width = (frac * 100) + '%';
-            });
-            encryptPackages.push({ name: key + '.kjk', blob: pkg.blob, idx: idx++, hasPwd: pkg.hasPwd });
-          } else {
-            const content = await buildPackageFromTasks(tasks, password, sharedSalt, hasPwd);
-            encryptPackages.push({ name: key + '.kjk', content, idx: idx++ });
-          }
-        }
-        encryptResultData = null;
       }
+      encryptResultData = null;
     }
 
     const resultDiv = document.getElementById('encryptResult');
@@ -2261,7 +2288,7 @@ async function doEncrypt() {
         <div class="package-item fade-in">
           <div class="package-item-info">
             <div class="package-item-name">${escapeHtml(pkg.name)}</div>
-            <div class="package-item-meta">${formatSize(new Blob([pkg.content]).size)}</div>
+            <div class="package-item-meta">${formatSize(pkg.content ? new Blob([pkg.content]).size : 0)}</div>
           </div>
           <button class="btn btn-sm btn-primary" onclick="downloadEncryptPackage(${pkg.idx})">
             <span data-i18n="savePackage">Save Package</span>
@@ -2269,11 +2296,21 @@ async function doEncrypt() {
         </div>
       `).join('');
       applyI18n();
+      setEncryptCopyVisible(false);
     } else {
       resultText.style.display = 'block';
       packageList.style.display = 'none';
-      const outputContent = encryptResultData.content;
-      resultText.textContent = outputContent.substring(0, 300) + (outputContent.length > 300 ? '...' : '');
+      const isKjk9 = encryptResultData && encryptResultData.type === 'kjk9';
+      if (isKjk9) {
+        // KJKv9 二进制: 无法复制, 自动触发下载保存 .kjk 文件
+        resultText.textContent = t('kjk9Done');
+        setEncryptCopyVisible(false);
+        downloadKjk9Blob(encryptResultData.blob, encryptResultData.name || 'encrypted.kjk');
+      } else {
+        const outputContent = (encryptResultData && encryptResultData.content) || '';
+        resultText.textContent = outputContent.substring(0, 300) + (outputContent.length > 300 ? '...' : '');
+        setEncryptCopyVisible(true);
+      }
     }
 
     showToast(t('encryptSuccess'));
@@ -3323,6 +3360,27 @@ function loadFormatSettings() {
   }
 }
 
+// ======================== Encrypt Algorithm (加密页) ========================
+function setEncryptCopyVisible(show) {
+  const btn = document.getElementById('encryptCopyBtn');
+  if (btn) btn.style.display = show ? '' : 'none';
+}
+function setEncryptAlg(value) {
+  encryptAlg = value || 'KJKv9';
+  localStorage.setItem('kjk_encrypt_alg', encryptAlg);
+  const label = encryptAlg === 'KJKv9' ? t('algKjk9') : t('algLegacy');
+  showToast(t('encryptAlgorithm') + ': ' + label);
+}
+
+function loadEncryptAlg() {
+  const saved = localStorage.getItem('kjk_encrypt_alg') || 'KJKv9';
+  encryptAlg = saved;
+  const select = document.getElementById('encryptAlgSelect');
+  if (select) select.value = saved;
+  // KJKv9 默认隐藏复制按钮(其结果只支持下载)
+  setEncryptCopyVisible(saved === 'legacy');
+}
+
 async function kjkVersionRequest() {
   const payload = JSON.stringify({
     header: 'kjk_version',
@@ -3511,6 +3569,7 @@ function downloadWithProgress(url) {
 
   loadUpdateSettings();
   loadFormatSettings();
+  loadEncryptAlg();
   const serverInput = document.getElementById('updateServerInput');
   if (serverInput) {
     serverInput.addEventListener('change', saveUpdateServer);
