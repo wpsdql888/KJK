@@ -124,7 +124,8 @@ if os.path.exists(legacy_exe):
 source_files = [
     'engine.py', 'main.py', 'context_menu.py', 'kjk9.py', 'browse.py',
     'api_server.py', 'config.py', 'build.py', 'installer.py', 'uninstaller.py',
-    'api_docs.html', 'kjkfast.c', 'LICENSE', 'README-LICENSE.txt', 'requirements.txt',
+    'api_docs.html', 'kjkfast.c', 'README-LICENSE.txt', 'requirements.txt',
+    '../LICENSE',
 ]
 source_zip = 'source.zip'
 print(f'正在打包源代码到 {source_zip}...')
@@ -132,7 +133,7 @@ try:
     with zipfile.ZipFile(source_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
         for fname in source_files:
             if os.path.exists(fname):
-                zf.write(fname, fname)
+                zf.write(fname, os.path.basename(fname))
         # 图标目录
         if os.path.isdir('icon'):
             for root, dirs, files in os.walk('icon'):
@@ -168,7 +169,7 @@ cmd += [
     '--add-data=uninstaller.py;.',
     '--add-data=api_docs.html;.',
     '--add-data=source.zip;.',
-    '--add-data=LICENSE;.',
+    '--add-data=../LICENSE;LICENSE',
     '--add-data=README-LICENSE.txt;.',
 ]
 cmd += [
