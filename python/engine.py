@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""KJK Encryptor - 核心加密引擎 v1.0.4 (AES-256-GCM + 密码头)
+"""KJK Encryptor - 核心加密引擎 v1.1.0 (AES-256-GCM + 密码头)
 
 v7 设计 (新版):
   - 加密算法: AES-256-GCM (认证加密,防止篡改)

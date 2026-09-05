@@ -53,7 +53,7 @@ def _get_app():
 
     @app.route('/status', methods=['GET'])
     def status():
-        return jsonify({'status': 'ok', 'name': 'KJK Encryptor API', 'version': '1.0.4'})
+        return jsonify({'status': 'ok', 'name': 'KJK Encryptor API', 'version': '1.1.0'})
 
     @app.route('/settings/compat-format', methods=['GET', 'POST'])
     def api_compat_format():

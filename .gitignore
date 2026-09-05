@@ -4,6 +4,10 @@ dist/
 python/build/
 python/*.spec
 python/engine/*.dll
+python/source.zip
+file/build_www/
+file/build_installer/
+file/build_uninstaller/
 
 # ===== Python 缓存 =====
 __pycache__/

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""KJK Encryptor - 独立卸载程序 v1.0.4
+"""KJK Encryptor - 独立卸载程序 v1.1.0
 
 用法: python uninstaller.py [--silent]
       或以管理员身份运行以完整卸载注册表项

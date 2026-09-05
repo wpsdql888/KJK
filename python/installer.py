@@ -20,7 +20,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
 
-INSTALLER_VERSION = '1.0.4'
+INSTALLER_VERSION = '1.1.0'
 
 
 def get_resource_path(relative_path):
