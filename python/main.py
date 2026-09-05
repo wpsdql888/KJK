@@ -2409,9 +2409,10 @@ class KJKApp:
                         'User-Agent': 'KJK-Encryptor/' + CURRENT_VERSION
                     })
                 with urllib.request.urlopen(req, timeout=10) as resp:
-                    data = json.loads(resp.read().decode('utf-8', 'replace'))
-                    if isinstance(data, dict):
-                        return data
+                    raw = resp.read().decode('utf-8')
+                    result = json.loads(raw)
+                    if result.get('status') == 'success':
+                        return result.get('data', {})
             except Exception:
                 continue
         return None
